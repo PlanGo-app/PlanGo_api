@@ -18,8 +18,8 @@ public class ApiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		String sql = "INSERT INTO User (pseudo, email) VALUES ("
-				+ "'Marc', 'marc@codejava.net')";
+		String sql = "INSERT INTO public.user (pseudo, email) VALUES ("
+				+ "'Marc', 'marc@codejava.net');";
 
 		int rows = jdbcTemplate.update(sql);
 		if (rows > 0) {
