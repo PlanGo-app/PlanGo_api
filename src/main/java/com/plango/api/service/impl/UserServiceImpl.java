@@ -5,7 +5,9 @@ import com.plango.api.repository.UserRepository;
 import com.plango.api.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -13,7 +15,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    public void addUser(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElse(null);
+        System.out.println(user.getPseudo());
+        return user;
     }
 }

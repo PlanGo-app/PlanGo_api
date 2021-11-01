@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
-public class ApiApplication implements CommandLineRunner {
+public class ApiApplication {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -16,14 +16,4 @@ public class ApiApplication implements CommandLineRunner {
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		String sql = "INSERT INTO public.user (pseudo, email) VALUES ("
-				+ "'Marc', 'marc@codejava.net');";
-
-		int rows = jdbcTemplate.update(sql);
-		if (rows > 0) {
-			System.out.println("A new row has been inserted.");
-		}
-	}
 }
