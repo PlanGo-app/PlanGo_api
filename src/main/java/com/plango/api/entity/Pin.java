@@ -3,9 +3,10 @@ package com.plango.api.entity;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.postgresql.geometric.PGpoint;
 
 import javax.persistence.*;
+
+import org.postgresql.geometric.PGpoint;
 
 @Setter
 @Getter
@@ -15,11 +16,11 @@ public class Pin extends BaseEntity {
     @NotNull
     private String name;
 
-    @NotNull // TODO change long_lat to point in db
-    @Column(name = "long_lat")
+    @NotNull
+    @Column(name = "localisation")
     private PGpoint point;
 
-    @NotNull // TODO change travel_id to travel
+    @NotNull
     @ManyToOne
     private Travel travel;
 

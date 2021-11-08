@@ -5,10 +5,13 @@ import com.plango.api.repository.UserRepository;
 import com.plango.api.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
@@ -26,4 +29,10 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByPseudo(username).orElseThrow(() -> new UsernameNotFoundException("User " + username + " doesn't exist."));
+		return user;
+	}
 }
