@@ -13,16 +13,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
-
     @Override
-    public void addUser(User user) {
+    public void addOrUpdateUser(User user) {
         userRepository.save(user);
     }
 
     @Override
     public User getUserById(Long id) {
         User user = userRepository.findById(id).orElse(null);
-        System.out.println(user.getPseudo());
+        if(user != null){
+            System.out.println(user.getPseudo());
+        }
         return user;
     }
 }
