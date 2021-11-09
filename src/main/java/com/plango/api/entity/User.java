@@ -9,10 +9,12 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
+@IdClass(UserCompositeKey.class)
 public class User extends BaseEntity {
-    @NotNull
-    private String pseudo;
+    @Id
     private String email;
+    @Id
+    private String pseudo;
     @NotNull
     private String password;
 }
