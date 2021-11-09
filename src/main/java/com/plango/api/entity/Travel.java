@@ -25,12 +25,10 @@ public class Travel extends BaseEntity {
     private LocalDateTime dateEnd;
 
     @NotNull
-    @Column(name = "created_by")
     @OneToOne
     private User createdBy;
 
     @NotNull
-    @Column(name = "member_list")
     @OneToMany
     private List<User> members;
 }

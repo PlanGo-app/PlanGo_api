@@ -16,6 +16,7 @@ public class Pin extends BaseEntity {
     private String name;
 
     @NotNull // TODO change long_lat to point in db
+    @Column(name = "long_lat")
     private PGpoint point;
 
     @NotNull // TODO change travel_id to travel
@@ -23,7 +24,6 @@ public class Pin extends BaseEntity {
     private Travel travel;
 
     @NotNull
-    @Column(name = "created_by")
     @OneToOne
     private User createdBy;
 }
