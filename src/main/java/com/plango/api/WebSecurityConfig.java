@@ -1,5 +1,6 @@
 package com.plango.api;
 
+import com.plango.api.security.JwtChecker;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,10 +36,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
     
-   /* @Bean
-	public AuthTokenFilter jwtAuthenticationFilter() {
-		return new AuthTokenFilter();
-	}*/
+    @Bean
+	public JwtChecker jwtCheck() {
+		return new JwtChecker();
+	}
 
     @Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -49,15 +50,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
             .authorizeRequests()
-            //.antMatchers("/auth/**").permitAll()
-            //.anyRequest().authenticated()
-            .anyRequest().permitAll()
+            .antMatchers("/auth/**").permitAll()
+            .anyRequest().authenticated()
             .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-           /* .and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
             .exceptionHandling()
             .authenticationEntryPoint((req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED : " + ex.getMessage()))
             .and()
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  */
+            .addFilterAfter(jwtCheck(), UsernamePasswordAuthenticationFilter.class);
     }
 }

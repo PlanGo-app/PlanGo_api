@@ -32,7 +32,6 @@ public class AuthController {
     ResponseEntity<String> login(@RequestBody CredentialDto credentials) throws Exception {
 
     	try {
-    		
     		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
 
     		Authentication auth = authenticationManager.authenticate(upat);
@@ -40,7 +39,6 @@ public class AuthController {
             String token = jwtGenerator.generateToken(auth);
 
             return new ResponseEntity<String>(token, HttpStatus.OK);
-            
     	}
     	catch (AuthenticationException e) {
     		throw new Exception("Wrong pseudo or password.");

@@ -2,8 +2,6 @@ package com.plango.api.security;
 
 import java.util.Date;
 
-import com.plango.api.entity.User;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -18,13 +16,13 @@ public class JwtGenerator {
     private String secretKey;
 
     public String generateToken(Authentication auth) {
-        User user = (User) auth.getPrincipal();
+        UserAuthDetails userAuthDetails = (UserAuthDetails) auth.getPrincipal();
 
         return Jwts.builder()
-                    .setSubject(user.getPseudo())
+                    .setSubject(userAuthDetails.getUsername())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + 850000))
-                    .signWith(SignatureAlgorithm.HS512, secretKey.getBytes())
+                    .signWith(SignatureAlgorithm.HS512, secretKey)
                     .compact();
     }
 }
