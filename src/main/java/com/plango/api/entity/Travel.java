@@ -29,7 +29,6 @@ public class Travel extends BaseEntity {
     private User createdBy;
 
     @NotNull
-    @Column(name = "member_list")
     @OneToMany
     private List<User> members;
 }

@@ -20,7 +20,6 @@ public class Pin extends BaseEntity {
     private PGpoint point;
 
     @NotNull // TODO change travel_id to travel
-    @Column(name = "travel_id")
     @ManyToOne
     private Travel travel;
 
