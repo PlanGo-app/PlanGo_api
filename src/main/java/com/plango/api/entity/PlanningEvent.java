@@ -1,29 +1,34 @@
 package com.plango.api.entity;
 
+import com.plango.api.common.types.TransportType;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.postgresql.geometric.PGpoint;
 
 import javax.persistence.*;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "Pin")
-public class Pin extends BaseEntity {
+@Table(name = "planning_event")
+public class PlanningEvent extends BaseEntity {
     @NotNull
     private String name;
 
-    @NotNull // TODO change long_lat to point in db
-    @Column(name = "long_lat")
-    private PGpoint point;
-
-    @NotNull // TODO change travel_id to travel
+    @NotNull
     @ManyToOne
     private Travel travel;
 
     @NotNull
     @ManyToOne
     private User createdBy;
+
+    @OneToOne
+    private Pin pin;
+
+    private TransportType transportTypeToNext;
+
+    @OneToOne
+    private PlanningEvent eventAfter;
+
 }

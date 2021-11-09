@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "Travel")
+@Table(name = "travel")
 public class Travel extends BaseEntity {
     @NotNull
     private String name;
@@ -25,7 +25,7 @@ public class Travel extends BaseEntity {
     private LocalDateTime dateEnd;
 
     @NotNull
-    @OneToOne
+    @ManyToOne
     private User createdBy;
 
     @NotNull
