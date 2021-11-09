@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "travel")
 public class Travel extends BaseEntity {
     @NotNull
     private String name;
@@ -26,9 +25,11 @@ public class Travel extends BaseEntity {
 
     @NotNull
     @ManyToOne
+    @JoinColumn(name = "created_by")
     private User createdBy;
 
     @NotNull
-    @OneToMany
-    private List<User> members;
+    @OneToOne
+    @JoinColumn(name = "member_list")
+    private MemberList members;
 }

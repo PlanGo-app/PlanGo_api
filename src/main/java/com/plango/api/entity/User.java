@@ -9,7 +9,6 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "User")
 public class User extends BaseEntity {
     @NotNull
     private String pseudo;

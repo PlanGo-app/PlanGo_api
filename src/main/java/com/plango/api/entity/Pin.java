@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "Pin")
 public class Pin extends BaseEntity {
     @NotNull
     private String name;
@@ -21,9 +20,11 @@ public class Pin extends BaseEntity {
 
     @NotNull // TODO change travel_id to travel
     @ManyToOne
+    @JoinColumn(name = "travel")
     private Travel travel;
 
     @NotNull
     @ManyToOne
+    @JoinColumn(name = "created_by")
     private User createdBy;
 }

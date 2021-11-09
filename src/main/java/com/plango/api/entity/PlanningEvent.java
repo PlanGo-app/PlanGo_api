@@ -17,18 +17,22 @@ public class PlanningEvent extends BaseEntity {
 
     @NotNull
     @ManyToOne
+    @JoinColumn(name = "travel")
     private Travel travel;
 
     @NotNull
     @ManyToOne
+    @JoinColumn(name = "created_by")
     private User createdBy;
 
     @OneToOne
+    @JoinColumn(name = "pin")
     private Pin pin;
 
     private TransportType transportTypeToNext;
 
     @OneToOne
+    @JoinColumn(name = "event_after")
     private PlanningEvent eventAfter;
 
 }
