@@ -25,7 +25,6 @@ public class Pin extends BaseEntity {
     private Travel travel;
 
     @NotNull
-    @Column(name = "created_by")
     @OneToOne
     private User createdBy;
 }
