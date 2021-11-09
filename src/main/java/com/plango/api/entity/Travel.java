@@ -25,7 +25,6 @@ public class Travel extends BaseEntity {
     private LocalDateTime dateEnd;
 
     @NotNull
-    @Column(name = "created_by")
     @OneToOne
     private User createdBy;
 
