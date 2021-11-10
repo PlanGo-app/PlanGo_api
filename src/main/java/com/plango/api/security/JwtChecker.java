@@ -50,13 +50,17 @@ public class JwtChecker extends OncePerRequestFilter{
 			throws ServletException, IOException {
 
     	String token = getToken(request);
-    	if (token != null && check(token)) {
-    		String username = getUsernameWithValidToken(token);
-    		UserAuthDetails user = (UserAuthDetails) userDetailsService.loadUserByUsername(username);
-    		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-    		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-    		SecurityContextHolder.getContext().setAuthentication(authentication);
-    	}
+    	try {
+			if (token != null && check(token)) {
+				String username = getUsernameWithValidToken(token);
+				UserAuthDetails user = (UserAuthDetails) userDetailsService.loadUserByUsername(username);
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
+		}
 		filterChain.doFilter(request, response);
 	}
 

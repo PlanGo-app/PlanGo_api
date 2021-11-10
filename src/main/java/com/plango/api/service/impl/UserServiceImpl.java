@@ -14,7 +14,20 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Override
-    public void addOrUpdateUser(User user) {
+    public void addUser(User user) throws Exception {
+        boolean pseudoExists = pseudoTaken(user.getPseudo());
+        boolean emailExists = emailTaken(user.getEmail());
+
+        if(pseudoExists || emailExists){
+            throw new Exception("Pseudo or email already taken");
+        }
+        else {
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void updateUser(User user) {
         userRepository.save(user);
     }
 
@@ -25,5 +38,15 @@ public class UserServiceImpl implements UserService {
             System.out.println(user.getPseudo());
         }
         return user;
+    }
+
+    @Override
+    public boolean pseudoTaken(String pseudo){
+        return userRepository.findByPseudo(pseudo).isPresent();
+    }
+
+    @Override
+    public boolean emailTaken(String email){
+        return userRepository.findByEmail(email).isPresent();
     }
 }

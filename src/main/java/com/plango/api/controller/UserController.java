@@ -22,9 +22,14 @@ public class UserController {
 
     @PostMapping(path = "", consumes="application/json")
     ResponseEntity<String> createUser(@RequestBody User user) {
-    	String pwd = user.getPassword();
-    	user.setPassword(encoder.encode(pwd));
-        userService.addOrUpdateUser(user);
+        try {
+            String pwd = user.getPassword();
+            user.setPassword(encoder.encode(pwd));
+            userService.addUser(user);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Pseudo or email already taken.", HttpStatus.BAD_REQUEST);
+        }
         
         return new ResponseEntity<>(String.format("User %s created", user.getPseudo()), HttpStatus.CREATED);
     }
@@ -37,7 +42,7 @@ public class UserController {
         }
         userFind.setEmail(userDto.getEmail());
         userFind.setPassword(encoder.encode(userDto.getPassword()));
-        userService.addOrUpdateUser(userFind);
+        userService.updateUser(userFind);
         
         return new ResponseEntity<>(String.format("User %d updated", id), HttpStatus.OK);
     }
