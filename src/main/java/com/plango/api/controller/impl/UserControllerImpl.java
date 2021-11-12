@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
 public class UserControllerImpl implements UserController {
 
     @Autowired
@@ -22,11 +21,16 @@ public class UserControllerImpl implements UserController {
     @Autowired
     PasswordEncoder encoder;
 
+    @Override
+    public User getUserById(Long id) throws UserNotFoundException {
+
+
     public User getUserById(@PathVariable Long id) throws UserNotFoundException {
         return userService.getUserById(id);
     }
 
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    @Override
+    public ResponseEntity<String> createUser(User user) {
         userService.createUser(user);
         //
         try {
@@ -41,11 +45,12 @@ public class UserControllerImpl implements UserController {
         return new ResponseEntity<>(String.format("User %s created", user.getPseudo()), HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> updateUser(@PathVariable Long id,@RequestBody User user) {
+    @Override
+    public ResponseEntity<String> updateUser(Long id,User user) {
         try {
             userService.updateUser(id, user);
-        } catch (UserNotFoundException une) {
-            return new ResponseEntity<>(une.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
         }
         //
         userFind.setEmail(userDto.getEmail());
@@ -58,8 +63,8 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<String> deleteUser(Long id) {
         try {
             userService.deleteUser(id);
-        } catch (UserNotFoundException une) {
-            return new ResponseEntity<>(une.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(String.format("User %d deleted", id), HttpStatus.OK);
     }
