@@ -29,6 +29,12 @@ public class AuthController {
     @Autowired
     JwtGenerator jwtGenerator;
 
+    /**
+     * User log in the application
+     * @param credentials pseudo and password' user
+     * @return : token, or else : exception message
+     * @throws Exception if authentification failure
+     */
     @PostMapping("/login")
     ResponseEntity<String> login(@RequestBody CredentialDto credentials) throws Exception {
 
@@ -49,27 +55,32 @@ public class AuthController {
         
     }
 
+    /**
+     * New user sign up to the application
+     * @param newUser all new user essential information
+     * @return : token, or else : exception message
+     * @throws Exception if user already exists or when problem with the authentification
+     */
     @PostMapping("/signup")
     ResponseEntity<String> signup(@RequestBody User newUser) throws Exception {
 
+        // register password while it's not encoding yet to login
+        String decodePwd = newUser.getPassword();
+        // create user in the application
         ResponseEntity<String> create = userController.createUser(newUser);
         if(create.getStatusCode() == HttpStatus.BAD_REQUEST) {
         	throw new Exception(create.getBody());
         }
-        
-    	try {
-    		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(newUser.getPseudo(), newUser.getPassword());
 
-    		Authentication auth = authenticationManager.authenticate(upat);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            String token = jwtGenerator.generateToken(auth);
-
-            return new ResponseEntity<String>(token, HttpStatus.OK);
-    	}
-    	catch (AuthenticationException e) {
-    		throw new Exception("Couldn't create JWT token.");
-    	}
-        
+        // connect user to the applications
+        CredentialDto connect = new CredentialDto();
+        connect.setUsername(newUser.getPseudo());
+        connect.setPassword(decodePwd);
+        try {
+            return this.login(connect);
+        }catch(Exception e){
+            throw new Exception("Couldn't create JWT token.");
+        }
     }
 
 
