@@ -1,6 +1,6 @@
 package com.plango.api.entity;
 
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +9,13 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Entity
-@IdClass(UserCompositeKey.class)
 public class User extends BaseEntity {
-    @Id
+    @NotBlank
+    @Column(unique=true)
     private String email;
-    @Id
+    @NotBlank
+    @Column(unique=true)
     private String pseudo;
-    @NotNull
+    @NotBlank
     private String password;
 }
