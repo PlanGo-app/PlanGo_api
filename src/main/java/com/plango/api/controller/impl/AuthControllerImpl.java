@@ -1,5 +1,6 @@
 package com.plango.api.controller.impl;
 
+import com.plango.api.controller.AuthController;
 import com.plango.api.controller.UserController;
 import com.plango.api.dto.CredentialDto;
 import com.plango.api.entity.User;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthControllerImpl {
+public class AuthControllerImpl implements AuthController {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -33,7 +34,7 @@ public class AuthControllerImpl {
      * @param credentials pseudo and password' user
      * @return : token, or else : exception message
      */
-    ResponseEntity<String> login(@RequestBody CredentialDto credentials) {
+    public ResponseEntity<String> login(@RequestBody CredentialDto credentials) {
 
     	try {
     		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
@@ -57,7 +58,7 @@ public class AuthControllerImpl {
      * @param newUser all new user essential information
      * @return : token, or else : exception message
      */
-    ResponseEntity<String> signup(@RequestBody User newUser) {
+    public ResponseEntity<String> signup(@RequestBody User newUser) {
 
         // register password while it's not encoding yet to login
         String decodePwd = newUser.getPassword();
