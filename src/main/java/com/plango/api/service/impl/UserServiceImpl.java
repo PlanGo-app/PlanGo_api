@@ -1,11 +1,15 @@
 package com.plango.api.service.impl;
 
+import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.dto.UserDto;
 import com.plango.api.entity.User;
 import com.plango.api.repository.UserRepository;
 import com.plango.api.service.UserService;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,14 +19,12 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Override
-    public void createUser(User user)  throws Exception {
-        boolean pseudoExists = pseudoTaken(user.getPseudo());
-        boolean emailExists = emailTaken(user.getEmail());
-
-        if(pseudoExists || emailExists){
-            throw new Exception("Pseudo or email already taken");
-        }
-        else {
+    public void createUser(User user)  throws UserAlreadyExistsException {
+        if ( pseudoTaken(user.getPseudo()) ){
+            throw new UserAlreadyExistsException("Pseudo already taken");
+        } else if ( emailTaken(user.getEmail()) ) {
+            throw new UserAlreadyExistsException("Email already taken");
+        } else {
             userRepository.save(user);
         }
     }
@@ -49,13 +51,12 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
     }
 
-    @Override
-    public boolean pseudoTaken(String pseudo){
+
+    private boolean pseudoTaken(String pseudo){
         return userRepository.findByPseudo(pseudo).isPresent();
     }
 
-    @Override
-    public boolean emailTaken(String email){
+    private boolean emailTaken(String email){
         return userRepository.findByEmail(email).isPresent();
     }
 }
