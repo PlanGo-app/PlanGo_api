@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 public interface UserController {
 
     @GetMapping(path = "/{id}")
-    UserDto getUserById(@PathVariable Long id) throws UserNotFoundException;
+    ResponseEntity<UserDto> getUserById(@PathVariable Long id) throws UserNotFoundException;
 
     @PostMapping(path = "", consumes="application/json")
     ResponseEntity<String> createUser(@RequestBody UserDto userDto);

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +19,7 @@ public class User extends BaseEntity {
     private String pseudo;
     @NotBlank
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<MemberList> memberList;
 }

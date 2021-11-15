@@ -31,8 +31,13 @@ public class UserControllerImpl implements UserController {
     JwtChecker jwt;
 
     @Override
-    public UserDto getUserById(Long id) throws UserNotFoundException {
-        return convertToDto(userService.getUserById(id));
+    public ResponseEntity<UserDto> getUserById(Long id) {
+        try {
+            UserDto userDto = convertToDto(userService.getUserById(id));
+            return new ResponseEntity<>(userDto, HttpStatus.OK);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
@@ -74,7 +79,9 @@ public class UserControllerImpl implements UserController {
 
     private User convertToEntity(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
-        user.setPassword(encoder.encode(userDto.getPassword()));
+        if(user.getPassword() != null) {
+            user.setPassword(encoder.encode(userDto.getPassword()));
+        }
         return user;
     }
 }
