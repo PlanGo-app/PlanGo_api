@@ -18,7 +18,7 @@ public class MemberList extends BaseEntity {
     private User user;
 
     @NotNull
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
 

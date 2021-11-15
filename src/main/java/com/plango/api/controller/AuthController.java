@@ -1,6 +1,7 @@
 package com.plango.api.controller;
 
 import com.plango.api.dto.CredentialDto;
+import com.plango.api.dto.UserDto;
 import com.plango.api.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,5 +13,5 @@ public interface AuthController {
     ResponseEntity<String> login(@RequestBody CredentialDto credentials);
 
     @PostMapping("/signup")
-    ResponseEntity<String> signup(@RequestBody User newUser);
+    ResponseEntity<String> signup(@RequestBody UserDto userDto);
 }
