@@ -5,24 +5,24 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "member_list")
 public class MemberList extends BaseEntity {
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "member")
-    private User user;
+    private User member;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
 
-    @NotBlank
+    @NotNull
     private Role role;
 
 }

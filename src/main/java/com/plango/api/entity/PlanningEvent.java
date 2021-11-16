@@ -1,18 +1,19 @@
 package com.plango.api.entity;
 
 import com.plango.api.common.types.TransportType;
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "planning_event")
 public class PlanningEvent extends BaseEntity {
-    @NotNull
+    @NotBlank
     private String name;
 
     @NotNull

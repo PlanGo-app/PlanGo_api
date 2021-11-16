@@ -18,5 +18,5 @@ public interface UserController {
     ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDto userDto);
 
     @DeleteMapping(path = "/delete/{id}")
-    ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String header ,@PathVariable Long id);
+    ResponseEntity<String> deleteUser(@PathVariable Long id);
 }

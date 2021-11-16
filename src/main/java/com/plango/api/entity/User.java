@@ -20,6 +20,6 @@ public class User extends BaseEntity {
     @NotBlank
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "member")
     private List<MemberList> memberList;
 }

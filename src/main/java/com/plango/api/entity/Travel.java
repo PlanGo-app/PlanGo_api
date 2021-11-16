@@ -1,17 +1,18 @@
 package com.plango.api.entity;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Entity
 public class Travel extends BaseEntity {
-    @NotNull
+    @NotBlank
     private String name;
     private String country;
     private String city;

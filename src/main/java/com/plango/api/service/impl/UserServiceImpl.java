@@ -1,15 +1,15 @@
 package com.plango.api.service.impl;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
-import com.plango.api.dto.UserDto;
+import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.entity.User;
 import com.plango.api.repository.UserRepository;
+import com.plango.api.security.UserAuthDetails;
 import com.plango.api.service.UserService;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +17,27 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    IAuthenticationFacade authenticationFacade;
+
+    @Override
+    public User getUserById(Long id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElse(null);
+        if(user == null){
+            throw new UserNotFoundException(String.format("No user with id: %s were found", id));
+        }
+        return user;
+    }
+
+    @Override
+    public User getUserByPseudo(String pseudo) throws UserNotFoundException {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        if(user == null){
+            throw new UserNotFoundException(String.format("No user with pseudo: %s were found", pseudo));
+        }
+        return user;
+    }
 
     @Override
     public void createUser(User user)  throws UserAlreadyExistsException {
@@ -30,27 +51,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(User user) throws UserNotFoundException {
+    public void updateUser(User user) throws UserNotFoundException, CurrentUserAuthorizationException {
         getUserById(user.getId());
+        if(!userHasRight(user, authenticationFacade.getCurrentUserAuthDetails())) {
+            throw new CurrentUserAuthorizationException("Current user not authorized");
+        }
         userRepository.save(user);
     }
 
     @Override
-    public User getUserById(Long id) throws UserNotFoundException {
-        User user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            throw new UserNotFoundException(String.format("No user with id: %s were found", id));
-        }
-        return user;
-    }
-
-    @Override
-    public void deleteUser(Long id) throws UserNotFoundException {
+    public void deleteUser(Long id) throws UserNotFoundException, CurrentUserAuthorizationException {
         User user = getUserById(id);
-        // TODO check if user has right
+        if(!userHasRight(user, authenticationFacade.getCurrentUserAuthDetails())) {
+            throw new CurrentUserAuthorizationException("Current user not authorized");
+        }
         userRepository.delete(user);
     }
-
 
     private boolean pseudoTaken(String pseudo){
         return userRepository.findByPseudo(pseudo).isPresent();
@@ -58,5 +74,9 @@ public class UserServiceImpl implements UserService {
 
     private boolean emailTaken(String email){
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    private boolean userHasRight(User user, UserAuthDetails userAuthDetails) {
+        return user.getPseudo().equals(userAuthDetails.getUsername());
     }
 }

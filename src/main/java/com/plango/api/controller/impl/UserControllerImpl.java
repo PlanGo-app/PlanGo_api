@@ -1,11 +1,11 @@
 package com.plango.api.controller.impl;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
 import com.plango.api.dto.UserDto;
 import com.plango.api.entity.User;
-import com.plango.api.security.JwtChecker;
 import com.plango.api.service.UserService;
 
 import org.modelmapper.ModelMapper;
@@ -27,16 +27,13 @@ public class UserControllerImpl implements UserController {
     @Autowired
     PasswordEncoder encoder;
 
-    @Autowired
-    JwtChecker jwt;
-
     @Override
     public ResponseEntity<UserDto> getUserById(Long id) {
         try {
             UserDto userDto = convertToDto(userService.getUserById(id));
             return new ResponseEntity<>(userDto, HttpStatus.OK);
         } catch (UserNotFoundException unfe) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -44,8 +41,7 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<String> createUser(UserDto userDto) {
         try {
             userService.createUser(convertToEntity(userDto));
-        }
-        catch(UserAlreadyExistsException e){
+        } catch(UserAlreadyExistsException e){
             return new ResponseEntity<>("Pseudo or email already taken.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(String.format("User %s created", userDto.getPseudo()), HttpStatus.CREATED);
@@ -58,17 +54,19 @@ public class UserControllerImpl implements UserController {
             return new ResponseEntity<>(String.format("User %d updated", id), HttpStatus.OK);
         } catch (UserNotFoundException unfe) {
             return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException cuie) {
+            return new ResponseEntity<>(cuie.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @Override
-    public ResponseEntity<String> deleteUser(String header, Long id) {
+    public ResponseEntity<String> deleteUser(Long id) {
         try {
-            String token = jwt.getToken(header);
-            String username = jwt.getUsernameWithValidToken(token);
             userService.deleteUser(id);
         } catch (UserNotFoundException unfe) {
             return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException cuie) {
+            return new ResponseEntity<>(cuie.getMessage(), HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity<>(String.format("User %d deleted", id), HttpStatus.OK);
     }
@@ -79,7 +77,7 @@ public class UserControllerImpl implements UserController {
 
     private User convertToEntity(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
-        if(user.getPassword() != null) {
+        if (user.getPassword() != null) {
             user.setPassword(encoder.encode(userDto.getPassword()));
         }
         return user;

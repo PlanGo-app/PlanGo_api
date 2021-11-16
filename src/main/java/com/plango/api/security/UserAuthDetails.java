@@ -1,8 +1,10 @@
 package com.plango.api.security;
 
-import com.sun.istack.NotNull;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 public class UserAuthDetails implements UserDetails {
