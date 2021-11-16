@@ -1,8 +1,9 @@
 package com.plango.api.controller.impl;
 
-import javax.naming.ConfigurationException;
+import java.util.List;
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
+import com.plango.api.controller.AbstractController;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.entity.Travel;
@@ -14,12 +15,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TravelControllerImpl implements TravelController {
+public class TravelControllerImpl extends AbstractController implements TravelController {
 
     @Autowired
     TravelService travelService;
@@ -33,8 +32,7 @@ public class TravelControllerImpl implements TravelController {
     @Override
     public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserAuthDetails userAuth = (UserAuthDetails) auth.getPrincipal();
+        UserAuthDetails userAuth = getCurrentUser();
 
         if (userAuth != null) {
             try {
@@ -45,12 +43,17 @@ public class TravelControllerImpl implements TravelController {
                         String.format("New travel in %s,%s created.", newTravel.getCity(), newTravel.getCountry()),
                         HttpStatus.CREATED);
             } catch (IllegalArgumentException | MappingException e) {
-                return new ResponseEntity<>(
-                        "Couldn't create travel because of missing informations.", 
+                return new ResponseEntity<>("Couldn't create travel because of missing informations.",
                         HttpStatus.BAD_REQUEST);
             }
         }
-        
+
         return new ResponseEntity<>("No user authenticated", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<List<TravelDto>> getTravels() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
