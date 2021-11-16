@@ -4,7 +4,9 @@ import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
+import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
+import com.plango.api.dto.UserUpdateDto;
 import com.plango.api.entity.User;
 import com.plango.api.service.UserService;
 
@@ -48,9 +50,9 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<String> updateUser(Long id, UserDto userDto) {
+    public ResponseEntity<String> updateUser(Long id, UserUpdateDto userUpdateDto) {
         try {
-            userService.updateUser(convertToEntity(userDto));
+            userService.updateUser(id, convertToEntity(userUpdateDto));
             return new ResponseEntity<>(String.format("User %d updated", id), HttpStatus.OK);
         } catch (UserNotFoundException unfe) {
             return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
@@ -75,7 +77,7 @@ public class UserControllerImpl implements UserController {
         return modelMapper.map(user, UserDto.class);
     }
 
-    private User convertToEntity(UserDto userDto) {
+    private User convertToEntity(UserBaseDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         if (user.getPassword() != null) {
             user.setPassword(encoder.encode(userDto.getPassword()));

@@ -51,12 +51,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(User user) throws UserNotFoundException, CurrentUserAuthorizationException {
-        getUserById(user.getId());
-        if(!userHasRight(user, authenticationFacade.getCurrentUserAuthDetails())) {
+    public void updateUser(Long id, User user) throws UserNotFoundException, CurrentUserAuthorizationException {
+        User userOnUpdate = getUserById(id);
+        if(!userHasRight(userOnUpdate, authenticationFacade.getCurrentUserAuthDetails())) {
             throw new CurrentUserAuthorizationException("Current user not authorized");
         }
-        userRepository.save(user);
+        if(user.getEmail() != null) {
+            userOnUpdate.setEmail(user.getEmail());
+        }
+        if(user.getPassword() != null) {
+            userOnUpdate.setPassword(user.getPassword());
+        }
+        userRepository.save(userOnUpdate);
     }
 
     @Override
