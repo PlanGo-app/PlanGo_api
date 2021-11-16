@@ -13,8 +13,8 @@ public class AuthenticationFacade implements IAuthenticationFacade {
     public UserAuthDetails getCurrentUserAuthDetails() throws CurrentUserAuthorizationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userAuth = auth.getPrincipal();
-        if(userAuth instanceof UserAuthDetails userAuthDetails) {
-            return userAuthDetails;
+        if(userAuth instanceof UserAuthDetails) {
+            return (UserAuthDetails) userAuth;
         } else {
             throw new CurrentUserAuthorizationException("Could not find current user");
         }
