@@ -1,11 +1,11 @@
 package com.plango.api.entity;
 
 import com.plango.api.common.types.Role;
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
@@ -14,11 +14,11 @@ import javax.persistence.*;
 public class MemberList extends BaseEntity {
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "user")
-    private User user;
+    @JoinColumn(name = "member")
+    private User member;
 
     @NotNull
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
 

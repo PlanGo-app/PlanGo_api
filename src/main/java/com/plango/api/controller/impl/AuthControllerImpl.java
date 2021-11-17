@@ -3,7 +3,7 @@ package com.plango.api.controller.impl;
 import com.plango.api.controller.AuthController;
 import com.plango.api.controller.UserController;
 import com.plango.api.dto.CredentialDto;
-import com.plango.api.entity.User;
+import com.plango.api.dto.UserDto;
 import com.plango.api.security.JwtGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthControllerImpl implements AuthController {
 
     @Autowired
@@ -55,22 +54,22 @@ public class AuthControllerImpl implements AuthController {
 
     /**
      * New user sign up to the application
-     * @param newUser all new user essential information
+     * @param userDto all new user essential information
      * @return : token, or else : exception message
      */
-    public ResponseEntity<String> signup(@RequestBody User newUser) {
+    public ResponseEntity<String> signup(@RequestBody UserDto userDto) {
 
         // register password while it's not encoding yet to login
-        String decodePwd = newUser.getPassword();
+        String decodePwd = userDto.getPassword();
         // create user in the application
-        ResponseEntity<String> create = userController.createUser(newUser);
+        ResponseEntity<String> create = userController.createUser(userDto);
         if(create.getStatusCode() == HttpStatus.BAD_REQUEST) {
         	return new ResponseEntity<>(create.getBody(), HttpStatus.BAD_REQUEST);
         }
 
         // connect user to the applications
         CredentialDto connect = new CredentialDto();
-        connect.setUsername(newUser.getPseudo());
+        connect.setUsername(userDto.getPseudo());
         connect.setPassword(decodePwd);
         try {
             return this.login(connect);

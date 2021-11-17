@@ -1,10 +1,16 @@
 package com.plango.api.controller.impl;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
+import com.plango.api.common.exception.UserAlreadyExistsException;
+import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
+import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
+import com.plango.api.dto.UserUpdateDto;
 import com.plango.api.entity.User;
 import com.plango.api.service.UserService;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,39 +18,70 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
 public class UserControllerImpl implements UserController {
 
     @Autowired
     UserService userService;
 
     @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     PasswordEncoder encoder;
 
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    @Override
+    public ResponseEntity<UserDto> getUserById(Long id) {
         try {
-            String pwd = user.getPassword();
-            user.setPassword(encoder.encode(pwd));
-            userService.addUser(user);
+            UserDto userDto = convertToDto(userService.getUserById(id));
+            return new ResponseEntity<>(userDto, HttpStatus.OK);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        catch(Exception e){
+    }
+
+    @Override
+    public ResponseEntity<String> createUser(UserDto userDto) {
+        try {
+            userService.createUser(convertToEntity(userDto));
+        } catch(UserAlreadyExistsException e){
             return new ResponseEntity<>("Pseudo or email already taken.", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(String.format("User %s created", user.getPseudo()), HttpStatus.CREATED);
+        return new ResponseEntity<>(String.format("User %s created", userDto.getPseudo()), HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> putUser(@PathVariable Long id,@RequestBody UserDto userDto) {
-        User userFind = userService.getUserById(id);
-        if(userFind == null){
-            return new ResponseEntity<>(String.format("User %d doesn't exist", id), HttpStatus.BAD_REQUEST);
+    @Override
+    public ResponseEntity<String> updateUser(Long id, UserUpdateDto userUpdateDto) {
+        try {
+            userService.updateUser(id, convertToEntity(userUpdateDto));
+            return new ResponseEntity<>(String.format("User %d updated", id), HttpStatus.OK);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException cuie) {
+            return new ResponseEntity<>(cuie.getMessage(), HttpStatus.UNAUTHORIZED);
         }
-        userFind.setEmail(userDto.getEmail());
-        userFind.setPassword(encoder.encode(userDto.getPassword()));
-        userService.updateUser(userFind);
-        return new ResponseEntity<>(String.format("User %d updated", id), HttpStatus.OK);
     }
 
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    @Override
+    public ResponseEntity<String> deleteUser(Long id) {
+        try {
+            userService.deleteUser(id);
+        } catch (UserNotFoundException unfe) {
+            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException cuie) {
+            return new ResponseEntity<>(cuie.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(String.format("User %d deleted", id), HttpStatus.OK);
+    }
+
+    private UserDto convertToDto(User user) {
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    private User convertToEntity(UserBaseDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
+        if (user.getPassword() != null) {
+            user.setPassword(encoder.encode(userDto.getPassword()));
+        }
+        return user;
     }
 }

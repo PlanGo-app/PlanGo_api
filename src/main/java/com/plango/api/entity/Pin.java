@@ -1,10 +1,11 @@
 package com.plango.api.entity;
 
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.postgresql.geometric.PGpoint;
 
@@ -12,7 +13,7 @@ import org.postgresql.geometric.PGpoint;
 @Getter
 @Entity
 public class Pin extends BaseEntity {
-    @NotNull
+    @NotBlank
     private String name;
 
     @NotNull

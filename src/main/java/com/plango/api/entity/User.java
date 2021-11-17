@@ -1,19 +1,25 @@
 package com.plango.api.entity;
 
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 public class User extends BaseEntity {
-    @NotNull
-    private String pseudo;
-    @NotNull
+    @NotBlank
+    @Column(unique=true)
     private String email;
-    @NotNull
+    @NotBlank
+    @Column(unique=true)
+    private String pseudo;
+    @NotBlank
     private String password;
+
+    @OneToMany(mappedBy = "member")
+    private List<MemberList> memberList;
 }

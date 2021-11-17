@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.plango.api.entity.User;
 import io.jsonwebtoken.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 public class JwtChecker extends OncePerRequestFilter{
 	
 	@Value("${jwt.secret}")
@@ -49,7 +46,8 @@ public class JwtChecker extends OncePerRequestFilter{
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-    	String token = getToken(request);
+		String header = request.getHeader("Authorization");
+    	String token = getToken(header);
     	try {
 			if (token != null && check(token)) {
 				String username = getUsernameWithValidToken(token);
@@ -64,8 +62,7 @@ public class JwtChecker extends OncePerRequestFilter{
 		filterChain.doFilter(request, response);
 	}
 
-	private String getToken(HttpServletRequest request) {
-		String header = request.getHeader("Authorization");
+	private String getToken(String header) {
 		if (header != null && header.startsWith("Bearer ")) {
 			return header.substring(7);
 		}
