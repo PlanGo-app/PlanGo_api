@@ -62,14 +62,14 @@ public class JwtChecker extends OncePerRequestFilter{
 		filterChain.doFilter(request, response);
 	}
 
-	public String getToken(String header) {
+	private String getToken(String header) {
 		if (header != null && header.startsWith("Bearer ")) {
 			return header.substring(7);
 		}
 		return null;
 	}
 
-	public String getUsernameWithValidToken(String token) {
+	private String getUsernameWithValidToken(String token) {
 		Claims claims = Jwts.parser()
 				.setSigningKey(secretKey)
 				.parseClaimsJws(token)

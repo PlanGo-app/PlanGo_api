@@ -4,7 +4,6 @@ import com.plango.api.controller.AuthController;
 import com.plango.api.controller.UserController;
 import com.plango.api.dto.CredentialDto;
 import com.plango.api.dto.UserDto;
-import com.plango.api.entity.User;
 import com.plango.api.security.JwtGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthControllerImpl implements AuthController {
 
     @Autowired
