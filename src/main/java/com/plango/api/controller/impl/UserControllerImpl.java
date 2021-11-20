@@ -29,6 +29,11 @@ public class UserControllerImpl implements UserController {
     @Autowired
     PasswordEncoder encoder;
 
+    /**
+     * Send user information
+     * @param id : user's id to find
+     * @return user information, or else : user with id not found
+     */
     @Override
     public ResponseEntity<UserDto> getUserById(Long id) {
         try {
@@ -39,6 +44,11 @@ public class UserControllerImpl implements UserController {
         }
     }
 
+    /**
+     * Create a new user
+     * @param userDto user's information
+     * @return CREATED, or else : exception message when user already exist
+     */
     @Override
     public ResponseEntity<String> createUser(UserDto userDto) {
         try {
@@ -49,6 +59,12 @@ public class UserControllerImpl implements UserController {
         return new ResponseEntity<>(String.format("User %s created", userDto.getPseudo()), HttpStatus.CREATED);
     }
 
+    /**
+     * Update a user
+     * @param id user's id
+     * @param userUpdateDto new user's information
+     * @return validation of update, or else : exception message when problem with user authenticated
+     */
     @Override
     public ResponseEntity<String> updateUser(Long id, UserUpdateDto userUpdateDto) {
         try {
@@ -61,6 +77,11 @@ public class UserControllerImpl implements UserController {
         }
     }
 
+    /**
+     * Delete a user
+     * @param id user's id to delete
+     * @return validation of deleting, or else : exception message when problem with user authenticated
+     */
     @Override
     public ResponseEntity<String> deleteUser(Long id) {
         try {

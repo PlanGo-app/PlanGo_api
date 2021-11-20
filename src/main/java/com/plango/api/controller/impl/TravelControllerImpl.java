@@ -28,6 +28,11 @@ public class TravelControllerImpl implements TravelController {
     @Autowired
     ModelMapper modelMapper;
 
+    /**
+     * User create a travel and is added to member list
+     * @param newTravelInfo travel information
+     * @return : CREATED, or else : exception message, or : user authenticated not found
+     */
     @Override
     public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
         try {
@@ -45,6 +50,10 @@ public class TravelControllerImpl implements TravelController {
 
     }
 
+    /**
+     * Send all user's travels information
+     * @return List<TravelDto> travels information, or else : user authenticated not found
+     */
     @Override
     public ResponseEntity<List<TravelDto>> getTravels() {
         try {
