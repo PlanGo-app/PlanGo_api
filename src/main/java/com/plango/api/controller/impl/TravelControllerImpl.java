@@ -1,9 +1,11 @@
 package com.plango.api.controller.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
-import com.plango.api.controller.AbstractController;
+import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.entity.Travel;
@@ -18,42 +20,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TravelControllerImpl extends AbstractController implements TravelController {
+public class TravelControllerImpl implements TravelController {
 
     @Autowired
     TravelService travelService;
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
-
-        UserAuthDetails userAuth = getCurrentUser();
-
-        if (userAuth != null) {
-            try {
-                Travel newTravel = modelMapper.map(newTravelInfo, Travel.class);
-                newTravel.setCreatedBy(userService.getUserByPseudo(userAuth.getUsername()));
-                travelService.addTravel(newTravel);
-                return new ResponseEntity<>(
-                        String.format("New travel in %s,%s created.", newTravel.getCity(), newTravel.getCountry()),
-                        HttpStatus.CREATED);
-            } catch (IllegalArgumentException | MappingException e) {
-                return new ResponseEntity<>("Couldn't create travel because of missing informations.",
-                        HttpStatus.BAD_REQUEST);
-            }
+        try {
+            Travel newTravel = modelMapper.map(newTravelInfo, Travel.class);
+            travelService.createTravel(newTravel);
+            return new ResponseEntity<>(
+                    String.format("New travel in %s, %s created.", newTravel.getCity(), newTravel.getCountry()),
+                    HttpStatus.CREATED);
+        } catch (IllegalArgumentException | MappingException e) {
+            return new ResponseEntity<>("Couldn't create travel because of missing or wrong informations.", HttpStatus.BAD_REQUEST);
+        }
+        catch (UserNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>("No user authenticated", HttpStatus.BAD_REQUEST);
     }
 
     @Override
     public ResponseEntity<List<TravelDto>> getTravels() {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            List<Travel> travelsOfUser = travelService.getTravelsOfCurrentUser();
+            List<TravelDto> travels = travelsOfUser.stream().map(travel -> modelMapper.map(travel, TravelDto.class)).collect(Collectors.toList());
+            return new ResponseEntity<>(travels, HttpStatus.OK);
+        }
+        catch (UserNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
