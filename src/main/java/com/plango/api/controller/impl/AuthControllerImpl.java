@@ -37,8 +37,6 @@ public class AuthControllerImpl implements AuthController {
 
     	try {
     		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
-    		System.out.println(upat.getCredentials());
-    		System.out.println(upat.getPrincipal());
     		
     		Authentication auth = authenticationManager.authenticate(upat);
             SecurityContextHolder.getContext().setAuthentication(auth);

@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -29,7 +30,6 @@ public class Travel extends BaseEntity {
     private User createdBy;
 
     @NotNull
-    @OneToOne
-    @JoinColumn(name = "member_list")
-    private MemberList members;
+    @OneToMany(mappedBy = "travel")
+    private List<MemberList> memberList;
 }
