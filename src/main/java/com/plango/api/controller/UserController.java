@@ -3,6 +3,7 @@ package com.plango.api.controller;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.dto.UserTravelsDto;
 import com.plango.api.dto.UserUpdateDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +26,5 @@ public interface UserController {
     ResponseEntity<String> deleteUser(@PathVariable Long id);
 
     @GetMapping("/{id}/travels")
-    ResponseEntity<List<TravelDto>> getTravelsByUser(@PathVariable Long id);
+    ResponseEntity<UserTravelsDto> getTravelsByUser(@PathVariable Long id);
 }
