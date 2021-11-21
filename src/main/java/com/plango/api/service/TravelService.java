@@ -2,6 +2,7 @@ package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
+import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.entity.MemberList;
@@ -33,16 +34,19 @@ public class TravelService {
     @Autowired
     IAuthenticationFacade authenticationFacade;
 
+    public Travel getTravelById(Long id) throws TravelNotFoundException {
+        Travel travel = travelRepository.findById(id).orElse(null);
+        if(travel == null){
+            throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
+        }
+        return travel;
+    }
+
     public void createTravel(Travel newTravel) throws UserNotFoundException {
         User currentUser = this.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
-
-        MemberList creatorMember = new MemberList();
-        creatorMember.setMember(currentUser);
-        creatorMember.setTravel(travel);
-        creatorMember.setRole(Role.ADMIN);
-        memberListRepository.save(creatorMember);
+        this.addMember(travel, currentUser, Role.ADMIN);
     }
 
     public List<Travel> getTravelsOfCurrentUser(Long id) throws UserNotFoundException {
@@ -53,6 +57,14 @@ public class TravelService {
             listTravels.add(listParticipation.getTravel());
         }
         return listTravels;
+    }
+
+    public void addMember(Travel travel, User user, Role userRole) {
+        MemberList newMember = new MemberList();
+        newMember.setMember(user);
+        newMember.setTravel(travel);
+        newMember.setRole(userRole);
+        memberListRepository.save(newMember);
     }
 
     private User getCurrentUser() throws UserNotFoundException {

@@ -4,13 +4,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
+import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
+import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.entity.Travel;
 
+import com.plango.api.entity.User;
 import com.plango.api.service.TravelService;
+import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,9 @@ public class TravelControllerImpl implements TravelController {
     TravelService travelService;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     ModelMapper modelMapper;
 
     /**
@@ -34,10 +42,9 @@ public class TravelControllerImpl implements TravelController {
     @Override
     public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
         try {
-            Travel newTravel = modelMapper.map(newTravelInfo, Travel.class);
-            travelService.createTravel(newTravel);
+            travelService.createTravel(this.convertToEntity(newTravelInfo));
             return new ResponseEntity<>(
-                    String.format("New travel in %s, %s created.", newTravel.getCity(), newTravel.getCountry()),
+                    "New travel created.",
                     HttpStatus.CREATED);
         } catch (IllegalArgumentException | MappingException e) {
             return new ResponseEntity<>("Couldn't create travel because of missing or wrong informations.", HttpStatus.BAD_REQUEST);
@@ -49,13 +56,29 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<String> addMemberToTravel(Long travelId) {
-        return null;
+    public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, Role role) {
+        try {
+            Travel travel = travelService.getTravelById(travelId);
+            User user = userService.getUserById(userId);
+            travelService.addMember(travel, user, role);
+            return new ResponseEntity<>("New member added to travel.", HttpStatus.OK);
+        }
+        catch (TravelNotFoundException | UserNotFoundException e) {
+            return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
     public ResponseEntity<List<UserDto>> getTravelMembers(Long travelId) {
         return null;
+    }
+
+    private TravelDto convertToDto(Travel travel) {
+        return modelMapper.map(travel, TravelDto.class);
+    }
+
+    private Travel convertToEntity(TravelDto travelDto) {
+        return modelMapper.map(travelDto, Travel.class);
     }
 
 
