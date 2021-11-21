@@ -4,11 +4,14 @@ import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
+import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.dto.UserUpdateDto;
+import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 
+import com.plango.api.service.TravelService;
 import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 public class UserControllerImpl implements UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    TravelService travelService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -92,6 +101,22 @@ public class UserControllerImpl implements UserController {
             return new ResponseEntity<>(cuie.getMessage(), HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity<>(String.format("User %d deleted", id), HttpStatus.OK);
+    }
+
+    /**
+     * Send all user's travels information
+     * @return List<TravelDto> travels information, or else : user authenticated not found
+     */
+    @Override
+    public ResponseEntity<List<TravelDto>> getTravelsByUser(Long id) {
+        try {
+            List<Travel> travelsOfUser = travelService.getTravelsOfCurrentUser(id);
+            List<TravelDto> travels = travelsOfUser.stream().map(travel -> modelMapper.map(travel, TravelDto.class)).collect(Collectors.toList());
+            return new ResponseEntity<>(travels, HttpStatus.OK);
+        }
+        catch(UserNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     private UserDto convertToDto(User user) {
