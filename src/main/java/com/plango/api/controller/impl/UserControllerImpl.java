@@ -8,8 +8,8 @@ import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.dto.UserUpdateDto;
 import com.plango.api.entity.User;
-import com.plango.api.service.UserService;
 
+import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
