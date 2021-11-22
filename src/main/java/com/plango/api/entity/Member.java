@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull;
 public class Member extends BaseEntity {
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "user")
-    private User user;
+    @JoinColumn(name = "userMember")
+    private User userMember;
 
     @NotNull
     @ManyToOne

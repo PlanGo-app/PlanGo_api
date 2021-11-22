@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface MemberRepository extends CrudRepository<Member, Long> {
-    List<Member> findAllByUser(User user);
+    List<Member> findAllByUserMember(User user);
     List<Member> findAllByTravel(Travel travel);
 }
