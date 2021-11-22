@@ -1,7 +1,10 @@
 package com.plango.api.controller.impl;
 
+import com.plango.api.common.component.AuthenticationFacade;
+import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.AuthController;
 import com.plango.api.controller.UserController;
+import com.plango.api.dto.AuthDto;
 import com.plango.api.dto.CredentialDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.security.JwtGenerator;
@@ -28,24 +31,30 @@ public class AuthControllerImpl implements AuthController {
     @Autowired
     JwtGenerator jwtGenerator;
 
+    @Autowired
+    AuthenticationFacade authenticationFacade;
+
     /**
      * User log in the application
      * @param credentials pseudo and password' user
      * @return : token, or else : exception message
      */
-    public ResponseEntity<String> login(@RequestBody CredentialDto credentials) {
+    public ResponseEntity<AuthDto> login(@RequestBody CredentialDto credentials) {
 
     	try {
     		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
     		
     		Authentication auth = authenticationManager.authenticate(upat);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            String token = jwtGenerator.generateToken(auth);
 
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            AuthDto authDto = new AuthDto();
+            authDto.setToken(jwtGenerator.generateToken(auth));
+            authDto.setUserId(authenticationFacade.getCurrentUser().getId());
+
+            return new ResponseEntity<>(authDto, HttpStatus.OK);
     	}
-    	catch (AuthenticationException e) {
-    		return new ResponseEntity<>("Wrong pseudo or password.", HttpStatus.BAD_REQUEST);
+    	catch (AuthenticationException | UserNotFoundException e) {
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
         
     }
@@ -55,14 +64,14 @@ public class AuthControllerImpl implements AuthController {
      * @param userDto all new user essential information
      * @return : token, or else : exception message
      */
-    public ResponseEntity<String> signup(@RequestBody UserDto userDto) {
+    public ResponseEntity<AuthDto> signup(@RequestBody UserDto userDto) {
 
         // register password while it's not encoding yet to login
         String decodePwd = userDto.getPassword();
         // create user in the application
         ResponseEntity<String> create = userController.createUser(userDto);
         if(create.getStatusCode() == HttpStatus.BAD_REQUEST) {
-        	return new ResponseEntity<>(create.getBody(), HttpStatus.BAD_REQUEST);
+        	return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         // connect user to the applications
@@ -72,7 +81,7 @@ public class AuthControllerImpl implements AuthController {
         try {
             return this.login(connect);
         }catch(Exception e){
-            return new ResponseEntity<>("Couldn't create JWT token.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
