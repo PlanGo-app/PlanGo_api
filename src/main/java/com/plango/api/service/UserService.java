@@ -1,18 +1,31 @@
 package com.plango.api.service;
 
-import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.dto.UserBaseDto;
+import com.plango.api.dto.UserDto;
+import com.plango.api.dto.UserUpdateDto;
+import com.plango.api.entity.Member;
+import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 import com.plango.api.repository.UserRepository;
-import com.plango.api.security.UserAuthDetails;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     UserRepository userRepository;
@@ -20,12 +33,11 @@ public class UserService {
     @Autowired
     IAuthenticationFacade authenticationFacade;
 
-    public User getUserById(Long id) throws UserNotFoundException {
-        User user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            throw new UserNotFoundException(String.format("No user with id: %s were found", id));
-        }
-        return user;
+    @Autowired
+    MemberService memberService;
+
+    public UserDto getCurrentUser() throws UserNotFoundException {
+        return convertToDto(authenticationFacade.getCurrentUser());
     }
 
     public User getUserByPseudo(String pseudo) throws UserNotFoundException {
@@ -36,36 +48,53 @@ public class UserService {
         return user;
     }
 
-    public void createUser(User user)  throws UserAlreadyExistsException {
-        if ( pseudoTaken(user.getPseudo()) ){
+    public void createUser(UserDto userDto)  throws UserAlreadyExistsException {
+        userDto.setEmail(userDto.getEmail().toLowerCase());
+        if ( pseudoTaken(userDto.getPseudo()) ){
             throw new UserAlreadyExistsException("Pseudo already taken");
-        } else if ( emailTaken(user.getEmail()) ) {
+        } else if ( emailTaken(userDto.getEmail().toLowerCase()) ) {
             throw new UserAlreadyExistsException("Email already taken");
         } else {
-            userRepository.save(user);
+            userRepository.save(convertToEntity(userDto));
         }
     }
 
-    public void updateUser(Long id, User user) throws UserNotFoundException, CurrentUserAuthorizationException {
-        User userOnUpdate = getUserById(id);
-        if(!userHasRight(userOnUpdate, authenticationFacade.getCurrentUserAuthDetails())) {
-            throw new CurrentUserAuthorizationException("Current user not authorized");
+    public void updateUser(UserUpdateDto userUpdateDto) throws UserNotFoundException {
+        User userOnUpdate = authenticationFacade.getCurrentUser();
+        if(userUpdateDto.getEmail() != null) {
+            userOnUpdate.setEmail(userUpdateDto.getEmail());
         }
-        if(user.getEmail() != null) {
-            userOnUpdate.setEmail(user.getEmail());
-        }
-        if(user.getPassword() != null) {
-            userOnUpdate.setPassword(user.getPassword());
+        if(userUpdateDto.getPassword() != null) {
+            userOnUpdate.setPassword(userUpdateDto.getPassword());
         }
         userRepository.save(userOnUpdate);
     }
 
-    public void deleteUser(Long id) throws UserNotFoundException, CurrentUserAuthorizationException {
-        User user = getUserById(id);
-        if(!userHasRight(user, authenticationFacade.getCurrentUserAuthDetails())) {
-            throw new CurrentUserAuthorizationException("Current user not authorized");
-        }
+    public void deleteCurrentUser() throws UserNotFoundException {
+        User user = authenticationFacade.getCurrentUser();
         userRepository.delete(user);
+    }
+
+    public List<Travel> getTravels() throws UserNotFoundException {
+        User user = authenticationFacade.getCurrentUser();
+        List<Member> listParticipations = memberService.getAllTravelsByUser(user);
+        List<Travel> listTravels = new ArrayList<>();
+        for(Member listParticipation : listParticipations){
+            listTravels.add(listParticipation.getTravel());
+        }
+        return listTravels;
+    }
+
+    public UserDto convertToDto(User user) {
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    public User convertToEntity(UserBaseDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
+        if (user.getPassword() != null) {
+            user.setPassword(encoder.encode(userDto.getPassword()));
+        }
+        return user;
     }
 
     private boolean pseudoTaken(String pseudo){
@@ -76,7 +105,4 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    private boolean userHasRight(User user, UserAuthDetails userAuthDetails) {
-        return user.getPseudo().equals(userAuthDetails.getUsername());
-    }
 }

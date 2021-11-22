@@ -23,7 +23,7 @@ public class MemberService {
     ModelMapper modelMapper;
 
     public List<Member> getAllTravelsByUser(User user) {
-        return memberRepository.findAllByUser(user);
+        return memberRepository.findAllByUserMember(user);
     }
 
     public List<Member> getAllMembersByTravel(Travel travel) {
@@ -37,7 +37,7 @@ public class MemberService {
 
     public MemberDto convertToDto(Member member) {
         MemberDto memberDto = new MemberDto();
-        UserDto userDto = modelMapper.map(member.getUser(), UserDto.class); // TODO : use userService or new package mapper
+        UserDto userDto = modelMapper.map(member.getUserMember(), UserDto.class);
         memberDto.setUser(userDto);
         memberDto.setRole(member.getRole());
         return memberDto;

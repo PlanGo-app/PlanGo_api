@@ -44,22 +44,13 @@ public class TravelService {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
-        this.addMember(travel, currentUser, Role.ADMIN);
+        this.addMember(travel, Role.ADMIN);
     }
 
-    public List<Travel> getTravelsOfCurrentUser(Long id) throws UserNotFoundException {
-        User currentUser = userService.getUserById(id);
-        List<Member> listParticipations = memberService.getAllTravelsByUser(currentUser);
-        List<Travel> listTravels = new ArrayList<>();
-        for(Member listParticipation : listParticipations){
-            listTravels.add(listParticipation.getTravel());
-        }
-        return listTravels;
-    }
-
-    public void addMember(Travel travel, User user, Role userRole) {
+    public void addMember(Travel travel, Role userRole) throws UserNotFoundException {
+        User user = authenticationFacade.getCurrentUser();
         Member newMember = new Member();
-        newMember.setUser(user);
+        newMember.setUserMember(user);
         newMember.setTravel(travel);
         newMember.setRole(userRole);
         memberService.createMember(newMember);
@@ -71,7 +62,7 @@ public class TravelService {
             throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
         }
         List<Member> listParticipants = memberService.getAllMembersByTravel(travel);
-        List<MemberDto> membersDto = new ArrayList();
+        List<MemberDto> membersDto = new ArrayList<>();
         for(Member participant : listParticipants) {
             membersDto.add(memberService.convertToDto(participant));
         }

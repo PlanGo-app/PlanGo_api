@@ -1,6 +1,5 @@
 package com.plango.api.controller;
 
-import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.dto.UserTravelsDto;
@@ -8,23 +7,22 @@ import com.plango.api.dto.UserUpdateDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RequestMapping("/user")
 public interface UserController {
 
-    @GetMapping(path = "/{id}")
-    ResponseEntity<UserDto> getUserById(@PathVariable Long id) throws UserNotFoundException;
+    @GetMapping(path = "")
+    ResponseEntity<UserDto> getCurrentUser() throws UserNotFoundException;
 
     @PostMapping(path = "", consumes="application/json")
     ResponseEntity<String> createUser(@RequestBody UserDto userDto);
 
-    @PutMapping(path = "/{id}")
-    ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserUpdateDto userUpdateDto);
+    @PutMapping(path = "")
+    ResponseEntity<String> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto);
 
-    @DeleteMapping(path = "/delete/{id}")
-    ResponseEntity<String> deleteUser(@PathVariable Long id);
+    @DeleteMapping(path = "/delete")
+    ResponseEntity<String> deleteCurrentUser();
 
-    @GetMapping("/{id}/travels")
-    ResponseEntity<UserTravelsDto> getTravelsByUser(@PathVariable Long id);
+    @GetMapping("/travels")
+    ResponseEntity<UserTravelsDto> getTravelsOfCurrentUser();
 }

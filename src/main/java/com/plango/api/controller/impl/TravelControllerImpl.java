@@ -10,7 +10,6 @@ import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.TravelMembersDto;
 import com.plango.api.entity.Travel;
 
-import com.plango.api.entity.User;
 import com.plango.api.service.TravelService;
 import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -56,8 +55,7 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, Role role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
-            User user = userService.getUserById(userId);
-            travelService.addMember(travel, user, role);
+            travelService.addMember(travel, role);
             return new ResponseEntity<>("New member added to travel.", HttpStatus.OK);
         }
         catch (TravelNotFoundException | UserNotFoundException e) {
@@ -73,10 +71,6 @@ public class TravelControllerImpl implements TravelController {
         catch(TravelNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    private TravelDto convertToDto(Travel travel) {
-        return modelMapper.map(travel, TravelDto.class);
     }
 
     private Travel convertToEntity(TravelDto travelDto) {
