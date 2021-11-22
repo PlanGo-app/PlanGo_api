@@ -1,7 +1,5 @@
 package com.plango.api.controller.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import com.plango.api.common.exception.TravelNotFoundException;
@@ -10,8 +8,6 @@ import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.TravelMembersDto;
-import com.plango.api.dto.UserBaseDto;
-import com.plango.api.dto.UserDto;
 import com.plango.api.entity.Travel;
 
 import com.plango.api.entity.User;
@@ -71,7 +67,12 @@ public class TravelControllerImpl implements TravelController {
 
     @Override
     public ResponseEntity<TravelMembersDto> getTravelMembers(Long travelId) {
-        return null;
+        try {
+            return new ResponseEntity<>(travelService.getMembers(travelId), HttpStatus.OK);
+        }
+        catch(TravelNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     private TravelDto convertToDto(Travel travel) {

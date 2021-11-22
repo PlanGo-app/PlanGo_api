@@ -10,12 +10,12 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Getter
 @Entity
-@Table(name = "member_list")
-public class MemberList extends BaseEntity {
+@Table(name = "member")
+public class Member extends BaseEntity {
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "member")
-    private User member;
+    @JoinColumn(name = "user")
+    private User user;
 
     @NotNull
     @ManyToOne

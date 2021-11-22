@@ -31,5 +31,5 @@ public class Travel extends BaseEntity {
 
     @NotNull
     @OneToMany(mappedBy = "travel")
-    private List<MemberList> memberList;
+    private List<Member> members;
 }

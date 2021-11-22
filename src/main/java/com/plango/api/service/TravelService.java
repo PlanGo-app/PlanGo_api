@@ -5,15 +5,14 @@ import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
+import com.plango.api.dto.MemberDto;
 import com.plango.api.dto.TravelMembersDto;
-import com.plango.api.entity.MemberList;
+import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
-import com.plango.api.repository.MemberListRepository;
 import com.plango.api.repository.TravelRepository;
 import com.plango.api.security.UserAuthDetails;
 
-import com.plango.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class TravelService {
     TravelRepository travelRepository;
 
     @Autowired
-    MemberListService memberListService;
+    MemberService memberService;
 
     @Autowired
     UserService userService;
@@ -52,20 +51,20 @@ public class TravelService {
 
     public List<Travel> getTravelsOfCurrentUser(Long id) throws UserNotFoundException {
         User currentUser = userService.getUserById(id);
-        List<MemberList> listParticipations = memberListService.getAllTravelsByUser(currentUser);
+        List<Member> listParticipations = memberService.getAllTravelsByUser(currentUser);
         List<Travel> listTravels = new ArrayList<>();
-        for(MemberList listParticipation : listParticipations){
+        for(Member listParticipation : listParticipations){
             listTravels.add(listParticipation.getTravel());
         }
         return listTravels;
     }
 
     public void addMember(Travel travel, User user, Role userRole) {
-        MemberList newMember = new MemberList();
-        newMember.setMember(user);
+        Member newMember = new Member();
+        newMember.setUser(user);
         newMember.setTravel(travel);
         newMember.setRole(userRole);
-        memberListService.createMember(newMember);
+        memberService.createMember(newMember);
     }
 
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
@@ -73,8 +72,12 @@ public class TravelService {
         if(travel == null){
             throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
         }
-        //List<MemberList> listParticipants = memberListRepository.findAllByTravel(travel);
-        return null;
+        List<Member> listParticipants = memberService.getAllMembersByTravel(travel);
+        List<MemberDto> membersDto = new ArrayList();
+        for(Member participant : listParticipants) {
+            membersDto.add(memberService.convertToDto(participant));
+        }
+        return new TravelMembersDto(membersDto);
     }
 
     private User getCurrentUser() throws UserNotFoundException {
