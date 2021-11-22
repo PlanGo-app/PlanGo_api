@@ -1,11 +1,9 @@
 package com.plango.api.controller;
 
-import java.util.List;
-
 import com.plango.api.common.types.Role;
 import com.plango.api.dto.TravelDto;
 
-import com.plango.api.dto.UserDto;
+import com.plango.api.dto.TravelMembersDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,5 +17,5 @@ public interface TravelController {
     ResponseEntity<String> addMemberToTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestBody Role role);
 
     @GetMapping("/{id}/members")
-    ResponseEntity<List<UserDto>> getTravelMembers(@PathVariable Long travelId);
+    ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);
 }

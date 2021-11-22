@@ -9,6 +9,7 @@ import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
+import com.plango.api.dto.TravelMembersDto;
 import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.entity.Travel;
@@ -69,7 +70,7 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<List<UserDto>> getTravelMembers(Long travelId) {
+    public ResponseEntity<TravelMembersDto> getTravelMembers(Long travelId) {
         return null;
     }
 
