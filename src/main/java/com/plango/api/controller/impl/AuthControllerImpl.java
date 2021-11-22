@@ -8,6 +8,7 @@ import com.plango.api.dto.AuthDto;
 import com.plango.api.dto.CredentialDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.security.JwtGenerator;
+import com.plango.api.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,16 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthControllerImpl implements AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserController userController;
-
-    @Autowired
-    JwtGenerator jwtGenerator;
-
-    @Autowired
-    AuthenticationFacade authenticationFacade;
+    AuthService authService;
 
     /**
      * User log in the application
@@ -42,15 +34,7 @@ public class AuthControllerImpl implements AuthController {
     public ResponseEntity<AuthDto> login(@RequestBody CredentialDto credentials) {
 
     	try {
-    		UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
-    		
-    		Authentication auth = authenticationManager.authenticate(upat);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            AuthDto authDto = new AuthDto();
-            authDto.setToken(jwtGenerator.generateToken(auth));
-            authDto.setUserId(authenticationFacade.getCurrentUser().getId());
-
+            AuthDto authDto = authService.getLogin(credentials);
             return new ResponseEntity<>(authDto, HttpStatus.OK);
     	}
     	catch (AuthenticationException | UserNotFoundException e) {
@@ -69,9 +53,8 @@ public class AuthControllerImpl implements AuthController {
         // register password while it's not encoding yet to login
         String decodePwd = userDto.getPassword();
         // create user in the application
-        ResponseEntity<String> create = userController.createUser(userDto);
-        if(create.getStatusCode() == HttpStatus.BAD_REQUEST) {
-        	return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if(authService.createNewUser(userDto) == false) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         // connect user to the applications
@@ -79,7 +62,7 @@ public class AuthControllerImpl implements AuthController {
         connect.setUsername(userDto.getPseudo());
         connect.setPassword(decodePwd);
         try {
-            return this.login(connect);
+            return new ResponseEntity<>(authService.getLogin(connect), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
