@@ -52,7 +52,7 @@ public class JwtChecker extends OncePerRequestFilter{
 			if (token != null && check(token)) {
 				String username = getUsernameWithValidToken(token);
 				UserAuthDetails user = (UserAuthDetails) userDetailsService.loadUserByUsername(username);
-				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}

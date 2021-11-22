@@ -21,5 +21,5 @@ public class User extends BaseEntity {
     private String password;
 
     @OneToMany(mappedBy = "member")
-    private List<MemberList> memberList;
+    private List<Member> travels;
 }
