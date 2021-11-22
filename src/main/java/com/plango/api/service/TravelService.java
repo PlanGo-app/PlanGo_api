@@ -5,6 +5,7 @@ import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
+import com.plango.api.dto.TravelMembersDto;
 import com.plango.api.entity.MemberList;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -26,7 +27,7 @@ public class TravelService {
     TravelRepository travelRepository;
 
     @Autowired
-    MemberListRepository memberListRepository;
+    MemberListService memberListService;
 
     @Autowired
     UserService userService;
@@ -51,7 +52,7 @@ public class TravelService {
 
     public List<Travel> getTravelsOfCurrentUser(Long id) throws UserNotFoundException {
         User currentUser = userService.getUserById(id);
-        List<MemberList> listParticipations = memberListRepository.findAllByMember(currentUser);
+        List<MemberList> listParticipations = memberListService.getAllTravelsByUser(currentUser);
         List<Travel> listTravels = new ArrayList<>();
         for(MemberList listParticipation : listParticipations){
             listTravels.add(listParticipation.getTravel());
@@ -64,7 +65,16 @@ public class TravelService {
         newMember.setMember(user);
         newMember.setTravel(travel);
         newMember.setRole(userRole);
-        memberListRepository.save(newMember);
+        memberListService.createMember(newMember);
+    }
+
+    public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
+        Travel travel = travelRepository.findById(id).orElse(null);
+        if(travel == null){
+            throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
+        }
+        //List<MemberList> listParticipants = memberListRepository.findAllByTravel(travel);
+        return null;
     }
 
     private User getCurrentUser() throws UserNotFoundException {
