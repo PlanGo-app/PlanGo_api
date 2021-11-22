@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import com.plango.api.controller.UserController;
 import com.plango.api.controller.impl.AuthControllerImpl;
 import com.plango.api.dto.CredentialDto;
-import com.plango.api.entity.User;
+import com.plango.api.dto.UserDto;
 import com.plango.api.security.JwtGenerator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,20 +40,21 @@ public class AuthControllerTest {
     private JwtGenerator jwtGenerator;
 
     private CredentialDto credentials;
-    private User newUser;
+    private UserDto newUser;
 
-    final String TEST = "test";
+    final String TestCredentials = "test";
+    final String TestEmail = "test@gmail.com";
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
         credentials = new CredentialDto();
-        credentials.setUsername(TEST);
-        credentials.setPassword(TEST);
-        newUser = new User();
-        newUser.setEmail("test@gmail.com");
-        newUser.setPseudo(TEST);
-        newUser.setPassword(TEST);
+        credentials.setUsername(TestCredentials);
+        credentials.setPassword(TestCredentials);
+        newUser = new UserDto();
+        newUser.setEmail(TestEmail);
+        newUser.setPseudo(TestCredentials);
+        newUser.setPassword(TestCredentials);
     }
 
     @Test
