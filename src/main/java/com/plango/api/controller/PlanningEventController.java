@@ -2,12 +2,13 @@ package com.plango.api.controller;
 
 import com.plango.api.entity.PlanningEvent;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/planning_event")
 public interface PlanningEventController {
     @GetMapping(path = "/{id}")
     ResponseEntity<PlanningEvent> getPlanningEventById(@PathVariable Long id);
+
+    @PutMapping(path = "/{id}", consumes="application/json")
+    ResponseEntity<String> updatePlanningEvent(@RequestBody PlanningEvent planningEvent);
 }
