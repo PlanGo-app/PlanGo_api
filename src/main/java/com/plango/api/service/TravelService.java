@@ -1,7 +1,6 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
-import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
@@ -11,7 +10,6 @@ import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 import com.plango.api.repository.TravelRepository;
-import com.plango.api.security.UserAuthDetails;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +41,7 @@ public class TravelService {
     }
 
     public void createTravel(Travel newTravel) throws UserNotFoundException {
-        User currentUser = this.getCurrentUser();
+        User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
         this.addMember(travel, currentUser, Role.ADMIN);
@@ -78,16 +76,6 @@ public class TravelService {
             membersDto.add(memberService.convertToDto(participant));
         }
         return new TravelMembersDto(membersDto);
-    }
-
-    private User getCurrentUser() throws UserNotFoundException {
-        try {
-            UserAuthDetails currentUserAuth = authenticationFacade.getCurrentUserAuthDetails();
-            return userService.getUserByPseudo(currentUserAuth.getUsername());
-        }
-        catch(CurrentUserAuthorizationException | UserNotFoundException e){
-            throw new UserNotFoundException("Couldn't find current user.");
-        }
     }
 
 }
