@@ -1,23 +1,16 @@
 package com.plango.api.controller.impl;
 
-import com.plango.api.common.component.AuthenticationFacade;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.AuthController;
-import com.plango.api.controller.UserController;
 import com.plango.api.dto.AuthDto;
 import com.plango.api.dto.CredentialDto;
 import com.plango.api.dto.UserDto;
-import com.plango.api.security.JwtGenerator;
 import com.plango.api.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
