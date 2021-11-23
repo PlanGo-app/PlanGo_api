@@ -3,6 +3,7 @@ package com.plango.api.service;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.UserBaseDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.dto.UserUpdateDto;
@@ -37,7 +38,7 @@ public class UserService {
     MemberService memberService;
 
     public UserDto getCurrentUser() throws UserNotFoundException {
-        return convertToDto(authenticationFacade.getCurrentUser());
+        return convertUserEntityToDto(authenticationFacade.getCurrentUser());
     }
 
     public User getUserById(Long userId) throws UserNotFoundException {
@@ -63,7 +64,7 @@ public class UserService {
         } else if ( emailTaken(userDto.getEmail().toLowerCase()) ) {
             throw new UserAlreadyExistsException("Email already taken");
         } else {
-            userRepository.save(convertToEntity(userDto));
+            userRepository.save(convertUserDtoToEntity(userDto));
         }
     }
 
@@ -73,7 +74,7 @@ public class UserService {
             userOnUpdate.setEmail(userUpdateDto.getEmail());
         }
         if(userUpdateDto.getPassword() != null) {
-            userOnUpdate.setPassword(userUpdateDto.getPassword());
+            userOnUpdate.setPassword(encoder.encode(userUpdateDto.getPassword()));
         }
         userRepository.save(userOnUpdate);
     }
@@ -83,21 +84,25 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<Travel> getTravels() throws UserNotFoundException {
+    public List<TravelDto> getTravels() throws UserNotFoundException {
         User user = authenticationFacade.getCurrentUser();
         List<Member> listParticipations = memberService.getAllTravelsByUser(user);
-        List<Travel> listTravels = new ArrayList<>();
+        List<TravelDto> listTravels = new ArrayList<>();
         for(Member listParticipation : listParticipations){
-            listTravels.add(listParticipation.getTravel());
+            listTravels.add(convertTravelEntityToDto(listParticipation.getTravel()));
         }
         return listTravels;
     }
 
-    public UserDto convertToDto(User user) {
+    public TravelDto convertTravelEntityToDto(Travel travel) {
+        return modelMapper.map(travel, TravelDto.class);
+    }
+
+    public UserDto convertUserEntityToDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
 
-    public User convertToEntity(UserBaseDto userDto) {
+    public User convertUserDtoToEntity(UserBaseDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         if (user.getPassword() != null) {
             user.setPassword(encoder.encode(userDto.getPassword()));

@@ -20,7 +20,7 @@ public interface UserController {
     @PutMapping(path = "")
     ResponseEntity<String> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto);
 
-    @DeleteMapping(path = "/delete")
+    @DeleteMapping(path = "")
     ResponseEntity<String> deleteCurrentUser();
 
     @GetMapping("/travels")

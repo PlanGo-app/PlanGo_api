@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TravelDto {
+    private Long id;
     private String name;
     private String country;
     private String city;
