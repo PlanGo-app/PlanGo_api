@@ -10,6 +10,7 @@ import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.TravelMembersDto;
 import com.plango.api.entity.Travel;
 
+import com.plango.api.entity.User;
 import com.plango.api.service.TravelService;
 import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -52,11 +53,17 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, Role role) {
+    public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, String role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
-            travelService.addMember(travel, role);
-            return new ResponseEntity<>("New member added to travel.", HttpStatus.OK);
+            User user = userService.getUserById(userId);
+            if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
+                travelService.addMember(travel, user, Role.valueOf(role));
+                return new ResponseEntity<>("New member added to travel.", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.BAD_REQUEST);
+            }
         }
         catch (TravelNotFoundException | UserNotFoundException e) {
             return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);

@@ -41,11 +41,10 @@ public class TravelService {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
-        this.addMember(travel, Role.ADMIN);
+        this.addMember(travel, currentUser, Role.ADMIN);
     }
 
-    public void addMember(Travel travel, Role userRole) throws UserNotFoundException {
-        User user = authenticationFacade.getCurrentUser();
+    public void addMember(Travel travel, User user, Role userRole) throws UserNotFoundException {
         Member newMember = new Member();
         newMember.setUserMember(user);
         newMember.setTravel(travel);

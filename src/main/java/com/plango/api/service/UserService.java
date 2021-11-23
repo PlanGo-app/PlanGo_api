@@ -40,6 +40,14 @@ public class UserService {
         return convertToDto(authenticationFacade.getCurrentUser());
     }
 
+    public User getUserById(Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null){
+            throw new UserNotFoundException(String.format("No user with id: %d were found", userId));
+        }
+        return user;
+    }
+
     public User getUserByPseudo(String pseudo) throws UserNotFoundException {
         User user = userRepository.findByPseudo(pseudo).orElse(null);
         if(user == null){
@@ -104,5 +112,4 @@ public class UserService {
     private boolean emailTaken(String email){
         return userRepository.findByEmail(email).isPresent();
     }
-
 }
