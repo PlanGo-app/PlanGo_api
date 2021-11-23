@@ -66,7 +66,8 @@ public class TravelControllerImpl implements TravelController {
     @Override
     public ResponseEntity<TravelMembersDto> getTravelMembers(Long travelId) {
         try {
-            return new ResponseEntity<>(travelService.getMembers(travelId), HttpStatus.OK);
+            TravelMembersDto members = travelService.getMembers(travelId);
+            return new ResponseEntity<>(members, HttpStatus.OK);
         }
         catch(TravelNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

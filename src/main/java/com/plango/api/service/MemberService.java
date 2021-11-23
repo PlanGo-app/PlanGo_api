@@ -27,8 +27,7 @@ public class MemberService {
     }
 
     public List<Member> getAllMembersByTravel(Travel travel) {
-        List<Member> members = memberRepository.findAllByTravel(travel);
-        return null;
+        return memberRepository.findAllByTravel(travel);
     }
 
     public void createMember(Member newMember){

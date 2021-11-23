@@ -27,9 +27,6 @@ public class TravelService {
     MemberService memberService;
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     IAuthenticationFacade authenticationFacade;
 
     public Travel getTravelById(Long id) throws TravelNotFoundException {

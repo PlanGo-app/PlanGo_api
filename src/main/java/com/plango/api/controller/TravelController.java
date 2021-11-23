@@ -16,6 +16,6 @@ public interface TravelController {
     @PostMapping("/{travelId}/member/{userId}")
     ResponseEntity<String> addMemberToTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestBody Role role);
 
-    @GetMapping("/{id}/members")
+    @GetMapping("/{travelId}/members")
     ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);
 }
