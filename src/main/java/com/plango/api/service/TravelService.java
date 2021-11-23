@@ -1,6 +1,7 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
@@ -44,7 +45,7 @@ public class TravelService {
         this.addMember(travel, currentUser, Role.ADMIN);
     }
 
-    public void addMember(Travel travel, User user, Role userRole) throws UserNotFoundException {
+    public void addMember(Travel travel, User user, Role userRole) {
         Member newMember = new Member();
         newMember.setUserMember(user);
         newMember.setTravel(travel);
@@ -63,6 +64,19 @@ public class TravelService {
             membersDto.add(memberService.convertToDto(participant));
         }
         return new TravelMembersDto(membersDto);
+    }
+
+    public void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
+        try {
+            User currentUser = authenticationFacade.getCurrentUser();
+            Member currentMember = memberService.getMemberByTravel(travel, currentUser);
+            if(currentMember.getRole() == Role.OBSERVER){
+                throw new CurrentUserAuthorizationException("Current user doesn't have organizer rights.");
+            }
+        }
+        catch(UserNotFoundException e) {
+            throw new CurrentUserAuthorizationException(e.getMessage());
+        }
     }
 
 }

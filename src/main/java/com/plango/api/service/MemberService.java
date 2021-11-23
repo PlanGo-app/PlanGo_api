@@ -1,5 +1,7 @@
 package com.plango.api.service;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
+import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.dto.MemberDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.entity.Member;
@@ -28,6 +30,14 @@ public class MemberService {
 
     public List<Member> getAllMembersByTravel(Travel travel) {
         return memberRepository.findAllByTravel(travel);
+    }
+
+    public Member getMemberByTravel(Travel travel, User user) throws UserNotFoundException {
+        Member member = memberRepository.findByTravelAndUserMember(travel, user).orElse(null);
+        if(member == null){
+            throw new UserNotFoundException("User not found for current travel.");
+        }
+        return member;
     }
 
     public void createMember(Member newMember){

@@ -2,6 +2,7 @@ package com.plango.api.controller.impl;
 
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
@@ -56,6 +57,7 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, String role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
+            travelService.checkOrganizerRoleCurrentUser(travel);
             User user = userService.getUserById(userId);
             if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
                 travelService.addMember(travel, user, Role.valueOf(role));
@@ -67,6 +69,9 @@ public class TravelControllerImpl implements TravelController {
         }
         catch (TravelNotFoundException | UserNotFoundException e) {
             return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);
+        }
+        catch(CurrentUserAuthorizationException e){
+            return new ResponseEntity<>("Current user not authorized to add a member to current travel.", HttpStatus.FORBIDDEN);
         }
     }
 

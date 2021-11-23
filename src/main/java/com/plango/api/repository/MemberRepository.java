@@ -7,9 +7,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends CrudRepository<Member, Long> {
     List<Member> findAllByUserMember(User user);
     List<Member> findAllByTravel(Travel travel);
+    Optional<Member> findByTravelAndUserMember(Travel traver, User user);
 }
