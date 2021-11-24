@@ -38,14 +38,17 @@ public class TravelService {
         return travel;
     }
 
-    public void createTravel(Travel newTravel) throws UserNotFoundException {
+    public void createTravel(Travel newTravel) throws UserNotFoundException, CurrentUserAuthorizationException {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
         this.addMember(travel, currentUser, Role.ADMIN);
     }
 
-    public void addMember(Travel travel, User user, Role userRole) {
+    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
+        if(authenticationFacade.getCurrentUser() != user){
+            this.checkOrganizerRoleCurrentUser(travel);
+        }
         Member newMember = new Member();
         newMember.setUserMember(user);
         newMember.setTravel(travel);
@@ -53,8 +56,16 @@ public class TravelService {
         memberService.createMember(newMember);
     }
 
-    public void updateMember(Travel travel, User user, Role userRole) throws UserNotFoundException{
+    public void updateMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
+        this.checkOrganizerRoleCurrentUser(travel);
         memberService.putMember(memberService.getMemberByTravel(travel, user), userRole);
+    }
+
+    public void deleteMember(Travel travel, User user) throws CurrentUserAuthorizationException, UserNotFoundException {
+        if(authenticationFacade.getCurrentUser() != user){
+            this.checkOrganizerRoleCurrentUser(travel);
+        }
+        memberService.deleteMember(memberService.getMemberByTravel(travel, user));
     }
 
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
@@ -70,7 +81,7 @@ public class TravelService {
         return new TravelMembersDto(membersDto);
     }
 
-    public void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
+    private void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
         try {
             User currentUser = authenticationFacade.getCurrentUser();
             Member currentMember = memberService.getMemberByTravel(travel, currentUser);

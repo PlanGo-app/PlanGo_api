@@ -49,6 +49,10 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void deleteMember(Member member){
+        memberRepository.delete(member);
+    }
+
     public MemberDto convertToDto(Member member) {
         MemberDto memberDto = new MemberDto();
         UserDto userDto = modelMapper.map(member.getUserMember(), UserDto.class);

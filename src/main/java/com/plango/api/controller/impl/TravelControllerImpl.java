@@ -47,7 +47,7 @@ public class TravelControllerImpl implements TravelController {
         } catch (IllegalArgumentException | MappingException e) {
             return new ResponseEntity<>("Couldn't create travel because of missing or wrong informations.", HttpStatus.BAD_REQUEST);
         }
-        catch (UserNotFoundException e){
+        catch (UserNotFoundException | CurrentUserAuthorizationException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
 
@@ -57,11 +57,10 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, String role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
-            travelService.checkOrganizerRoleCurrentUser(travel);
             User user = userService.getUserById(userId);
             if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
                 travelService.addMember(travel, user, Role.valueOf(role));
-                return new ResponseEntity<>("New member added to travel.", HttpStatus.OK);
+                return new ResponseEntity<>("New member added to travel.", HttpStatus.CREATED);
             }
             else {
                 return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.BAD_REQUEST);
@@ -79,7 +78,6 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<String> updateMemberOfTravel(Long travelId, Long userId, String role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
-            travelService.checkOrganizerRoleCurrentUser(travel);
             User user = userService.getUserById(userId);
             if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
                 travelService.updateMember(travel, user, Role.valueOf(role));
@@ -90,17 +88,27 @@ public class TravelControllerImpl implements TravelController {
             }
         }
         catch (TravelNotFoundException | UserNotFoundException e) {
-            return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Couldn't modify travel's member because travel or user were not found.", HttpStatus.NOT_FOUND);
         }
         catch(CurrentUserAuthorizationException e){
-            return new ResponseEntity<>("Current user not authorized to add a member to current travel.", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Current user not authorized to modify a member's role for current travel.", HttpStatus.FORBIDDEN);
         }
     }
 
     @Override
     public ResponseEntity<String> deleteMemberOfTravel(Long travelId, Long userId) {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            Travel travel = travelService.getTravelById(travelId);
+            User user = userService.getUserById(userId);
+            travelService.deleteMember(travel, user);
+            return new ResponseEntity<>("Member deleted.", HttpStatus.OK);
+        }
+        catch (TravelNotFoundException | UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(CurrentUserAuthorizationException e){
+            return new ResponseEntity<>("Current user not authorized to delete a member for current travel.", HttpStatus.FORBIDDEN);
+        }
     }
 
     @Override

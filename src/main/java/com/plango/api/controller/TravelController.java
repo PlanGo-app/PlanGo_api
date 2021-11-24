@@ -1,6 +1,5 @@
 package com.plango.api.controller;
 
-import com.plango.api.common.types.Role;
 import com.plango.api.dto.TravelDto;
 
 import com.plango.api.dto.TravelMembersDto;
