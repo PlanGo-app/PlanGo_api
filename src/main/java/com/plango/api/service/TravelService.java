@@ -57,13 +57,13 @@ public class TravelService {
     }
 
     public void updateMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
-        this.checkOrganizerRoleCurrentUser(travel);
+        this.checkAdminRoleCurrentUser(travel);
         memberService.putMember(memberService.getMemberByTravel(travel, user), userRole);
     }
 
     public void deleteMember(Travel travel, User user) throws CurrentUserAuthorizationException, UserNotFoundException {
         if(authenticationFacade.getCurrentUser() != user){
-            this.checkOrganizerRoleCurrentUser(travel);
+            this.checkAdminRoleCurrentUser(travel);
         }
         memberService.deleteMember(memberService.getMemberByTravel(travel, user));
     }
@@ -87,6 +87,19 @@ public class TravelService {
             Member currentMember = memberService.getMemberByTravel(travel, currentUser);
             if(currentMember.getRole() == Role.OBSERVER){
                 throw new CurrentUserAuthorizationException("Current user doesn't have organizer rights.");
+            }
+        }
+        catch(UserNotFoundException e) {
+            throw new CurrentUserAuthorizationException(e.getMessage());
+        }
+    }
+
+    private void checkAdminRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
+        try {
+            User currentUser = authenticationFacade.getCurrentUser();
+            Member currentMember = memberService.getMemberByTravel(travel, currentUser);
+            if(currentMember.getRole() != Role.ADMIN){
+                throw new CurrentUserAuthorizationException("Current user doesn't have admin rights.");
             }
         }
         catch(UserNotFoundException e) {
