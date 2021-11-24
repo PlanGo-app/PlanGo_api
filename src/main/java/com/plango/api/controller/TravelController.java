@@ -1,6 +1,5 @@
 package com.plango.api.controller;
 
-import com.plango.api.common.types.Role;
 import com.plango.api.dto.TravelDto;
 
 import com.plango.api.dto.TravelMembersDto;
@@ -15,6 +14,12 @@ public interface TravelController {
 
     @PostMapping("/{travelId}/member/{userId}")
     ResponseEntity<String> addMemberToTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestParam String role);
+
+    @PutMapping("/{travelId}/member/{userId}")
+    ResponseEntity<String> updateMemberOfTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestParam String role);
+
+    @DeleteMapping("/{travelId}/member/{userId}")
+    ResponseEntity<String> deleteMemberOfTravel(@PathVariable Long travelId, @PathVariable Long userId);
 
     @GetMapping("/{travelId}/members")
     ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);

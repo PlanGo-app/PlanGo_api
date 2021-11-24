@@ -38,19 +38,34 @@ public class TravelService {
         return travel;
     }
 
-    public void createTravel(Travel newTravel) throws UserNotFoundException {
+    public void createTravel(Travel newTravel) throws UserNotFoundException, CurrentUserAuthorizationException {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         Travel travel = travelRepository.save(newTravel);
         this.addMember(travel, currentUser, Role.ADMIN);
     }
 
-    public void addMember(Travel travel, User user, Role userRole) {
+    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
+        if(authenticationFacade.getCurrentUser() != user){
+            this.checkOrganizerRoleCurrentUser(travel);
+        }
         Member newMember = new Member();
         newMember.setUserMember(user);
         newMember.setTravel(travel);
         newMember.setRole(userRole);
         memberService.createMember(newMember);
+    }
+
+    public void updateMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
+        this.checkAdminRoleCurrentUser(travel);
+        memberService.putMember(memberService.getMemberByTravel(travel, user), userRole);
+    }
+
+    public void deleteMember(Travel travel, User user) throws CurrentUserAuthorizationException, UserNotFoundException {
+        if(authenticationFacade.getCurrentUser() != user){
+            this.checkAdminRoleCurrentUser(travel);
+        }
+        memberService.deleteMember(memberService.getMemberByTravel(travel, user));
     }
 
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
@@ -66,12 +81,25 @@ public class TravelService {
         return new TravelMembersDto(membersDto);
     }
 
-    public void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
+    private void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
         try {
             User currentUser = authenticationFacade.getCurrentUser();
             Member currentMember = memberService.getMemberByTravel(travel, currentUser);
             if(currentMember.getRole() == Role.OBSERVER){
                 throw new CurrentUserAuthorizationException("Current user doesn't have organizer rights.");
+            }
+        }
+        catch(UserNotFoundException e) {
+            throw new CurrentUserAuthorizationException(e.getMessage());
+        }
+    }
+
+    private void checkAdminRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
+        try {
+            User currentUser = authenticationFacade.getCurrentUser();
+            Member currentMember = memberService.getMemberByTravel(travel, currentUser);
+            if(currentMember.getRole() != Role.ADMIN){
+                throw new CurrentUserAuthorizationException("Current user doesn't have admin rights.");
             }
         }
         catch(UserNotFoundException e) {
