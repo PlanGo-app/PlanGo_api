@@ -53,6 +53,10 @@ public class TravelService {
         memberService.createMember(newMember);
     }
 
+    public void updateMember(Travel travel, User user, Role userRole) throws UserNotFoundException{
+        memberService.putMember(memberService.getMemberByTravel(travel, user), userRole);
+    }
+
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
         Travel travel = travelRepository.findById(id).orElse(null);
         if(travel == null){

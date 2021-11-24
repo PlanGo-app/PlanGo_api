@@ -76,6 +76,34 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
+    public ResponseEntity<String> updateMemberOfTravel(Long travelId, Long userId, String role) {
+        try {
+            Travel travel = travelService.getTravelById(travelId);
+            travelService.checkOrganizerRoleCurrentUser(travel);
+            User user = userService.getUserById(userId);
+            if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
+                travelService.updateMember(travel, user, Role.valueOf(role));
+                return new ResponseEntity<>(String.format("Member updated with %s role.", role), HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (TravelNotFoundException | UserNotFoundException e) {
+            return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);
+        }
+        catch(CurrentUserAuthorizationException e){
+            return new ResponseEntity<>("Current user not authorized to add a member to current travel.", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deleteMemberOfTravel(Long travelId, Long userId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public ResponseEntity<TravelMembersDto> getTravelMembers(Long travelId) {
         try {
             TravelMembersDto members = travelService.getMembers(travelId);
@@ -89,6 +117,5 @@ public class TravelControllerImpl implements TravelController {
     private Travel convertToEntity(TravelDto travelDto) {
         return modelMapper.map(travelDto, Travel.class);
     }
-
 
 }

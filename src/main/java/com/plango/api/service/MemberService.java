@@ -1,7 +1,7 @@
 package com.plango.api.service;
 
-import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.common.types.Role;
 import com.plango.api.dto.MemberDto;
 import com.plango.api.dto.UserDto;
 import com.plango.api.entity.Member;
@@ -42,6 +42,11 @@ public class MemberService {
 
     public void createMember(Member newMember){
         memberRepository.save(newMember);
+    }
+
+    public void putMember(Member member, Role role){
+        member.setRole(role);
+        memberRepository.save(member);
     }
 
     public MemberDto convertToDto(Member member) {
