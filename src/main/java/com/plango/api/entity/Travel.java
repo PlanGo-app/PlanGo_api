@@ -30,6 +30,10 @@ public class Travel extends BaseEntity {
     private User createdBy;
 
     @NotNull
+    @Column(name = "invitation_code")
+    private String invitationCode;
+
+    @NotNull
     @OneToMany(mappedBy = "travel")
     private List<Member> members;
 }
