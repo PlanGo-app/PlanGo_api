@@ -1,5 +1,6 @@
 package com.plango.api.service;
 
+import com.plango.api.common.component.CodeGenerator;
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
@@ -30,6 +31,9 @@ public class TravelService {
     @Autowired
     IAuthenticationFacade authenticationFacade;
 
+    @Autowired
+    CodeGenerator codeGenerator;
+
     public Travel getTravelById(Long id) throws TravelNotFoundException {
         Travel travel = travelRepository.findById(id).orElse(null);
         if(travel == null){
@@ -41,6 +45,7 @@ public class TravelService {
     public void createTravel(Travel newTravel) throws UserNotFoundException, CurrentUserAuthorizationException {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
+        newTravel.setInvitationCode(this.generateUniqueInvitationCode());
         Travel travel = travelRepository.save(newTravel);
         this.addMember(travel, currentUser, Role.ADMIN);
     }
@@ -105,6 +110,14 @@ public class TravelService {
         catch(UserNotFoundException e) {
             throw new CurrentUserAuthorizationException(e.getMessage());
         }
+    }
+
+    private String generateUniqueInvitationCode(){
+        String invitation = codeGenerator.randomInvitationCode();
+        if(travelRepository.existsByInvitationCode(invitation)){
+            return generateUniqueInvitationCode();
+        }
+        return invitation;
     }
 
 }
