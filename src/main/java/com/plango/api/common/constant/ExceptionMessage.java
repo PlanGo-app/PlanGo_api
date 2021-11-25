@@ -9,5 +9,6 @@ public final class ExceptionMessage {
     public static final String TRAVEL_NOT_FOUND = "Travel not found";
     public static final String PLANNING_EVENT_NOT_FOUND = "Planning not found";
     public static final String PIN_NOT_FOUND = "Pin not found";
+    public static final String DATE_START_SHOULD_BE_BEFORE_DATE_END = "Date start of the planning event should be before its date end";
 
 }
