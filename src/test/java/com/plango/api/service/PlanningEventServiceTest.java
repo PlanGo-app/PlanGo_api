@@ -2,10 +2,7 @@ package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.constant.ExceptionMessage;
-import com.plango.api.common.exception.CurrentUserAuthorizationException;
-import com.plango.api.common.exception.PlanningEventNotFoundException;
-import com.plango.api.common.exception.TravelNotFoundException;
-import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.common.exception.*;
 import com.plango.api.common.types.TransportType;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
@@ -115,7 +112,7 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveNewEntity() throws UserNotFoundException, TravelNotFoundException {
+    void shouldSaveNewEntity() throws UserNotFoundException, TravelNotFoundException, DateOrderException {
         //ARRANGE
         CreatePlanningEventDto createPlanningEventDto = buildCreatePlanningEventDto();
         when(travelService.getTravelById(anyLong())).thenReturn(new Travel());
@@ -131,7 +128,7 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveTheUpdatedEntity() throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
+    void shouldSaveTheUpdatedEntity() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, DateOrderException {
         //ARRANGE
         UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
         when(planningEventRepository.findById(1L)).thenReturn(Optional.of(buildPlanningEvent()));
