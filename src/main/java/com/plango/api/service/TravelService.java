@@ -54,12 +54,14 @@ public class TravelService {
         newMember.setTravel(travel);
         newMember.setRole(userRole);
         memberService.createMember(newMember);
-    }
+    } //TODO Mettre un rôle != de Admin
 
     public void updateMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
         this.checkAdminRoleCurrentUser(travel);
         memberService.putMember(memberService.getMemberByTravel(travel, user), userRole);
     }
+    //TODO Mise à jour du rôle d'un membre != de Admin, admin et organizer peuvent passer un observer à organizer, mais seul admin peut rétrograder
+    // (un organizer peut également se rétrograder)
 
     public void deleteMember(Travel travel, User user) throws CurrentUserAuthorizationException, UserNotFoundException {
         if(authenticationFacade.getCurrentUser() != user){
@@ -106,5 +108,4 @@ public class TravelService {
             throw new CurrentUserAuthorizationException(e.getMessage());
         }
     }
-
 }
