@@ -29,9 +29,6 @@ public class TravelControllerImpl implements TravelController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     /**
      * User create a travel and is added to member list
      * @param newTravelInfo travel information
@@ -40,7 +37,7 @@ public class TravelControllerImpl implements TravelController {
     @Override
     public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
         try {
-            travelService.createTravel(this.convertToEntity(newTravelInfo));
+            travelService.createTravel(travelService.convertToEntity(newTravelInfo));
             return new ResponseEntity<>(
                     "New travel created.",
                     HttpStatus.CREATED);
@@ -122,8 +119,15 @@ public class TravelControllerImpl implements TravelController {
         }
     }
 
-    private Travel convertToEntity(TravelDto travelDto) {
-        return modelMapper.map(travelDto, Travel.class);
+    @Override
+    public ResponseEntity<TravelDto> getTravelWithInvitation(String code) {
+        try {
+            TravelDto travelFound = travelService.getTravelByInvitationCode(code);
+            return new ResponseEntity<>(travelFound, HttpStatus.OK);
+        }
+        catch(TravelNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

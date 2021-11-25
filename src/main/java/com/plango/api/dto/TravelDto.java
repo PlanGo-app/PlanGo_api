@@ -14,4 +14,5 @@ public class TravelDto {
     private String city;
     private LocalDateTime dateStart;
     private LocalDateTime dateEnd;
+    private String invitationCode;
 }

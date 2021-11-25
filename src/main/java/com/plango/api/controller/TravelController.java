@@ -23,4 +23,7 @@ public interface TravelController {
 
     @GetMapping("/{travelId}/members")
     ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);
+
+    @GetMapping("/invitation")
+    ResponseEntity<TravelDto> getTravelWithInvitation(@RequestParam String code);
 }
