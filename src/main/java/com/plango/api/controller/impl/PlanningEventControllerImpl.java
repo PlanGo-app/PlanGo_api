@@ -3,12 +3,17 @@ package com.plango.api.controller.impl;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.PlanningEventNotFoundException;
 import com.plango.api.controller.PlanningEventController;
-import com.plango.api.entity.PlanningEvent;
+import com.plango.api.dto.planningevent.CreatePlanningEventDto;
+import com.plango.api.dto.planningevent.GetPlanningEventDto;
+import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.service.PlanningEventService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class PlanningEventControllerImpl implements PlanningEventController {
 
@@ -16,19 +21,30 @@ public class PlanningEventControllerImpl implements PlanningEventController {
     PlanningEventService planningEventService;
 
     @Override
-    public ResponseEntity<PlanningEvent> getPlanningEventById(Long id) {
+    public ResponseEntity<GetPlanningEventDto> getPlanningEventById(Long id) {
         try {
-            planningEventService.getPlanningEventById(id);
+            GetPlanningEventDto getPlanningEventDto = planningEventService.getPlanningEventById(id);
+            return ResponseEntity.ok(getPlanningEventDto);
         } catch (PlanningEventNotFoundException e) {
-            e.printStackTrace();
+            log.error("Planning event not found", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
-            e.printStackTrace();
+            log.error("Cannot access to planning event", e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return null;
     }
 
     @Override
-    public ResponseEntity<String> updatePlanningEvent(PlanningEvent planningEvent) {
-        return null;
+    public ResponseEntity<String> updatePlanningEvent(UpdatePlanningEventDto updatePlanningEventDto) {
+        try {
+            planningEventService.updatePlanningEvent(updatePlanningEventDto);
+            return ResponseEntity.ok("Planning event updated");
+        } catch (PlanningEventNotFoundException e) {
+            log.error("Planning event not found", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            log.error("Cannot update planning event", e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }
