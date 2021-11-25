@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-public class UpdatePlanningEventDto {
+public class UpdatePlanningEventDto implements PlanningEventDto{
     private Long id;
     private String name;
     private LocalDateTime dateStart;

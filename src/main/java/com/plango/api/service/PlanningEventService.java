@@ -2,12 +2,10 @@ package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.constant.ExceptionMessage;
-import com.plango.api.common.exception.CurrentUserAuthorizationException;
-import com.plango.api.common.exception.PlanningEventNotFoundException;
-import com.plango.api.common.exception.TravelNotFoundException;
-import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.common.exception.*;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
+import com.plango.api.dto.planningevent.PlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.User;
@@ -41,14 +39,20 @@ public class PlanningEventService {
         return mapper.map(planningEvent, GetPlanningEventDto.class);
     }
 
-    public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws UserNotFoundException, TravelNotFoundException {
+    public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws UserNotFoundException, TravelNotFoundException, DateOrderException {
+        if(endDateIsBeforeStartDate(createPlanningEventDto)) {
+            throw new DateOrderException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
+        }
         travelService.getTravelById(createPlanningEventDto.getTravel().getId());
         PlanningEvent planningEvent = mapper.map(createPlanningEventDto, PlanningEvent.class);
         planningEvent.setCreatedBy(authenticationFacade.getCurrentUser());
         planningEventRepository.save(planningEvent);
     }
 
-    public void updatePlanningEvent(UpdatePlanningEventDto updatePlanningEventDto) throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
+    public void updatePlanningEvent(UpdatePlanningEventDto updatePlanningEventDto) throws PlanningEventNotFoundException, CurrentUserAuthorizationException, DateOrderException {
+        if(endDateIsBeforeStartDate(updatePlanningEventDto)) {
+            throw new DateOrderException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
+        }
         PlanningEvent planningEventOnUpdate = findPlanningEventById(updatePlanningEventDto.getId());
         if(!userCanWrite(planningEventOnUpdate)) {
             throw new CurrentUserAuthorizationException(String.format("Current User cannot update Planning event '%d'",planningEventOnUpdate.getId()));
@@ -73,6 +77,10 @@ public class PlanningEventService {
             throw new PlanningEventNotFoundException(String.format("No planning event with id %d were found", id));
         }
         return planningEvent;
+    }
+
+    private boolean endDateIsBeforeStartDate(PlanningEventDto planningEventDto) {
+        return planningEventDto.getDateEnd().isBefore(planningEventDto.getDateStart());
     }
 
     private boolean userCanWrite(PlanningEvent planningEvent) throws CurrentUserAuthorizationException {

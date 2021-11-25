@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-public class GetPlanningEventDto {
+public class GetPlanningEventDto implements PlanningEventDto{
     private Long id;
     private String name;
     private Travel travel;

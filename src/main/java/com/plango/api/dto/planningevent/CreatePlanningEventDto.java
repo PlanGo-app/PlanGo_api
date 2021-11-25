@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class CreatePlanningEventDto {
+public class CreatePlanningEventDto implements PlanningEventDto{
     private String name;
     private Travel travel;
     private Pin pin;

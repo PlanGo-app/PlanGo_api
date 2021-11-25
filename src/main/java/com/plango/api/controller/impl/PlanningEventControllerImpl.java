@@ -1,9 +1,9 @@
 package com.plango.api.controller.impl;
 
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
+import com.plango.api.common.exception.DateOrderException;
 import com.plango.api.common.exception.PlanningEventNotFoundException;
 import com.plango.api.controller.PlanningEventController;
-import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.service.PlanningEventService;
@@ -26,10 +26,10 @@ public class PlanningEventControllerImpl implements PlanningEventController {
             GetPlanningEventDto getPlanningEventDto = planningEventService.getPlanningEventById(id);
             return ResponseEntity.ok(getPlanningEventDto);
         } catch (PlanningEventNotFoundException e) {
-            log.error("Planning event not found", e);
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
-            log.error("Cannot access to planning event", e);
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
@@ -40,11 +40,14 @@ public class PlanningEventControllerImpl implements PlanningEventController {
             planningEventService.updatePlanningEvent(updatePlanningEventDto);
             return ResponseEntity.ok("Planning event updated");
         } catch (PlanningEventNotFoundException e) {
-            log.error("Planning event not found", e);
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
-            log.error("Cannot update planning event", e);
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (DateOrderException e) {
+            log.error(e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }
