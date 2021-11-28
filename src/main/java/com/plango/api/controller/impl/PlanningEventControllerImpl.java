@@ -1,7 +1,7 @@
 package com.plango.api.controller.impl;
 
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
-import com.plango.api.common.exception.DateOrderException;
+import com.plango.api.common.exception.InvalidRequestDataException;
 import com.plango.api.common.exception.PlanningEventNotFoundException;
 import com.plango.api.controller.PlanningEventController;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
@@ -45,7 +45,7 @@ public class PlanningEventControllerImpl implements PlanningEventController {
         } catch (CurrentUserAuthorizationException e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (DateOrderException e) {
+        } catch (InvalidRequestDataException e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

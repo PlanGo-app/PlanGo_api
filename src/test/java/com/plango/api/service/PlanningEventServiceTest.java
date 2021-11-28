@@ -3,13 +3,12 @@ package com.plango.api.service;
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.*;
+import com.plango.api.common.types.Role;
 import com.plango.api.common.types.TransportType;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
-import com.plango.api.entity.PlanningEvent;
-import com.plango.api.entity.Travel;
-import com.plango.api.entity.User;
+import com.plango.api.entity.*;
 import com.plango.api.repository.PlanningEventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +16,11 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.parameters.P;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +39,9 @@ class PlanningEventServiceTest {
     private static final String EVENT_NAME = "Test Event";
     private static final String EVENT_NAME_UPDATED = "Test Event Updated";
     private static final Long CURRENT_USER_ID = 2L;
+    private static final Long NOT_CURRENT_USER_ID = 1234L;
     private static final String CURRENT_USER_PSEUDO = "Current user pseudo";
+    private static final String NOT_CURRENT_USER_PSEUDO = "Not current user pseudo";
     private static final Long TRAVEL_ID = 3L;
 
     @InjectMocks
@@ -66,7 +69,9 @@ class PlanningEventServiceTest {
     MemberService memberService;
 
     User currentUser;
+    User notCurrentUser;
     Travel travel;
+    Pin pin;
 
     @BeforeEach
     void setUp() throws UserNotFoundException {
@@ -74,8 +79,12 @@ class PlanningEventServiceTest {
         currentUser = new User();
         currentUser.setId(CURRENT_USER_ID);
         currentUser.setPseudo(CURRENT_USER_PSEUDO);
+        notCurrentUser = new User();
+        notCurrentUser.setId(NOT_CURRENT_USER_ID);
+        notCurrentUser.setPseudo(NOT_CURRENT_USER_PSEUDO);
         travel = new Travel();
         travel.setId(TRAVEL_ID);
+        pin = new Pin();
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
     }
 
@@ -112,7 +121,7 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveNewEntity() throws UserNotFoundException, TravelNotFoundException, DateOrderException {
+    void shouldSaveNewEntity() throws UserNotFoundException, TravelNotFoundException, InvalidRequestDataException {
         //ARRANGE
         CreatePlanningEventDto createPlanningEventDto = buildCreatePlanningEventDto();
         when(travelService.getTravelById(anyLong())).thenReturn(new Travel());
@@ -128,7 +137,7 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveTheUpdatedEntity() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, DateOrderException {
+    void shouldSaveTheUpdatedEntityIfUserIsOwner() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException {
         //ARRANGE
         UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
         when(planningEventRepository.findById(1L)).thenReturn(Optional.of(buildPlanningEvent()));
@@ -143,13 +152,34 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldThrowCUAException_WhenCurrentUserTryToUpdatePlanningEventAndIsNotOrganizerOrAdmin() {
+    void shouldSaveTheUpdatedEntityIfUserIsAdminOfBelongingTravel() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException, UserNotFoundException {
+        //ARRANGE
+        UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
+        when(planningEventRepository.findById(1L)).thenReturn(Optional.of(buildPlanningEventNotCurrentUser()));
+        Member member = new Member();
+        member.setRole(Role.ADMIN);
+        when(memberService.getMemberByTravel(travel, currentUser)).thenReturn(member);
+
+        //ACT
+        planningEventService.updatePlanningEvent(updatePlanningEventDto);
+
+        //ASSERT
+        verify(planningEventRepository).save(planningEventCaptor.capture());
+        PlanningEvent planningEventSaved = planningEventCaptor.getValue();
+        assertThat(planningEventSaved).usingRecursiveComparison().isEqualTo(buildExpectedUpdatedPlanningEventNotCurrentUser());
+    }
+
+    @Test
+    void shouldThrowCUAException_WhenCurrentUserTryToUpdatePlanningEventAndIsNotOrganizerOrAdmin() throws UserNotFoundException {
         //ARRANGE
         //ARRANGE
         UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
         PlanningEvent planningEventOfAnotherUser = buildPlanningEvent();
         planningEventOfAnotherUser.setCreatedBy(new User());
         when(planningEventRepository.findById(1L)).thenReturn(Optional.of(planningEventOfAnotherUser));
+        Member member = new Member();
+        member.setRole(Role.OBSERVER);
+        when(memberService.getMemberByTravel(travel, currentUser)).thenReturn(member);
 
         //ACT
         //ASSERT
@@ -179,7 +209,21 @@ class PlanningEventServiceTest {
         planningEvent.setId(EVENT_ID);
         planningEvent.setName(EVENT_NAME);
         planningEvent.setTravel(travel);
+        planningEvent.setPin(pin);
         planningEvent.setCreatedBy(currentUser);
+        planningEvent.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
+        planningEvent.setDateStart(DATE_START);
+        planningEvent.setDateEnd(DATE_END);
+        return planningEvent;
+    }
+
+    private PlanningEvent buildPlanningEventNotCurrentUser() {
+        PlanningEvent planningEvent = new PlanningEvent();
+        planningEvent.setId(EVENT_ID);
+        planningEvent.setName(EVENT_NAME);
+        planningEvent.setTravel(travel);
+        planningEvent.setPin(pin);
+        planningEvent.setCreatedBy(notCurrentUser);
         planningEvent.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         planningEvent.setDateStart(DATE_START);
         planningEvent.setDateEnd(DATE_END);
@@ -191,6 +235,7 @@ class PlanningEventServiceTest {
         expectedGetPlanningEventDto.setId(EVENT_ID);
         expectedGetPlanningEventDto.setName(EVENT_NAME);
         expectedGetPlanningEventDto.setTravel(travel);
+        expectedGetPlanningEventDto.setPin(pin);
         expectedGetPlanningEventDto.setCreatedBy(currentUser);
         expectedGetPlanningEventDto.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         expectedGetPlanningEventDto.setDateStart(DATE_START);
@@ -205,6 +250,7 @@ class PlanningEventServiceTest {
         CreatePlanningEventDto createPlanningEventDto = new CreatePlanningEventDto();
         createPlanningEventDto.setName(EVENT_NAME);
         createPlanningEventDto.setTravel(travel);
+        createPlanningEventDto.setPin(pin);
         createPlanningEventDto.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         createPlanningEventDto.setDateStart(DATE_START);
         createPlanningEventDto.setDateEnd(DATE_END);
@@ -216,6 +262,7 @@ class PlanningEventServiceTest {
         expectedCreatedPlanningEvent.setCreatedBy(currentUser);
         expectedCreatedPlanningEvent.setName(EVENT_NAME);
         expectedCreatedPlanningEvent.setTravel(travel);
+        expectedCreatedPlanningEvent.setPin(pin);
         expectedCreatedPlanningEvent.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         expectedCreatedPlanningEvent.setDateStart(DATE_START);
         expectedCreatedPlanningEvent.setDateEnd(DATE_END);
@@ -226,6 +273,7 @@ class PlanningEventServiceTest {
         PlanningEvent mappedPlanningEventFromCreateDto = new PlanningEvent();
         mappedPlanningEventFromCreateDto.setName(EVENT_NAME);
         mappedPlanningEventFromCreateDto.setTravel(travel);
+        mappedPlanningEventFromCreateDto.setPin(pin);
         mappedPlanningEventFromCreateDto.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         mappedPlanningEventFromCreateDto.setDateStart(DATE_START);
         mappedPlanningEventFromCreateDto.setDateEnd(DATE_END);
@@ -248,7 +296,21 @@ class PlanningEventServiceTest {
         PlanningEvent planningEvent = new PlanningEvent();
         planningEvent.setId(EVENT_ID);
         planningEvent.setTravel(travel);
+        planningEvent.setPin(pin);
         planningEvent.setCreatedBy(currentUser);
+        planningEvent.setName(EVENT_NAME_UPDATED);
+        planningEvent.setTransportTypeToNext(null);
+        planningEvent.setDateStart(DATE_START);
+        planningEvent.setDateEnd(DATE_END_UPDATED);
+        return planningEvent;
+    }
+
+    private PlanningEvent buildExpectedUpdatedPlanningEventNotCurrentUser() {
+        PlanningEvent planningEvent = new PlanningEvent();
+        planningEvent.setId(EVENT_ID);
+        planningEvent.setTravel(travel);
+        planningEvent.setPin(pin);
+        planningEvent.setCreatedBy(notCurrentUser);
         planningEvent.setName(EVENT_NAME_UPDATED);
         planningEvent.setTransportTypeToNext(null);
         planningEvent.setDateStart(DATE_START);
