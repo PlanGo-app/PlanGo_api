@@ -61,7 +61,7 @@ class UserRightTest {
     }
 
     @Test
-    void shouldReturnTrue_onCurrentUserCanRead_whenCurrentUserIsNotMemberOfTravel() throws CurrentUserAuthorizationException {
+    void shouldReturnFalse_onCurrentUserCanRead_whenCurrentUserIsNotMemberOfTravel() throws CurrentUserAuthorizationException {
         //ARRANGE
         when(memberService.isMember(currentUser, travel)).thenReturn(false);
 
