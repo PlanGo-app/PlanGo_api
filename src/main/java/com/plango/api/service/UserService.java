@@ -57,7 +57,7 @@ public class UserService {
         return user;
     }
 
-    public void createUser(UserDto userDto)  throws UserAlreadyExistsException {
+    public void createUser(UserDto userDto) throws UserAlreadyExistsException {
         userDto.setEmail(userDto.getEmail().toLowerCase());
         if ( pseudoTaken(userDto.getPseudo()) ){
             throw new UserAlreadyExistsException("Pseudo already taken");

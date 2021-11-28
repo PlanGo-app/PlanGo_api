@@ -1,6 +1,7 @@
 package com.plango.api.service;
 
-import com.plango.api.common.component.AuthenticationFacade;
+import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
 import com.plango.api.dto.authentication.AuthDto;
@@ -9,8 +10,6 @@ import com.plango.api.dto.user.UserDto;
 import com.plango.api.security.JwtGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,13 +24,13 @@ public class AuthService {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserController userController;
+    UserService userService;
 
     @Autowired
     JwtGenerator jwtGenerator;
 
     @Autowired
-    AuthenticationFacade authenticationFacade;
+    IAuthenticationFacade authenticationFacade;
 
     public AuthDto getLogin(CredentialDto credentials) throws AuthenticationException, UserNotFoundException {
 
@@ -48,9 +47,11 @@ public class AuthService {
     }
 
     public boolean createNewUser(UserDto userDto){
-        ResponseEntity<String> create = userController.createUser(userDto);
-        if(create.getStatusCode() == HttpStatus.BAD_REQUEST) {
-        	return false; 
+        try {
+            userService.createUser(userDto);
+        }
+        catch(UserAlreadyExistsException e){
+            return false;
         }
         return true;
     }
