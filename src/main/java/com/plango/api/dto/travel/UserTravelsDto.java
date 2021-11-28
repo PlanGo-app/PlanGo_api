@@ -1,4 +1,4 @@
-package com.plango.api.dto;
+package com.plango.api.dto.travel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TravelMembersDto {
-    List<MemberDto> members;
+public class UserTravelsDto {
+    List<GetTravelDto> travels;
 }

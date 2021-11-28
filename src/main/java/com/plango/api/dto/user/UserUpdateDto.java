@@ -1,6 +1,7 @@
-package com.plango.api.dto;
+package com.plango.api.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.plango.api.dto.user.UserBaseDto;
 import lombok.Getter;
 import lombok.Setter;
 

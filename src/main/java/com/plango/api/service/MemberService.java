@@ -2,8 +2,8 @@ package com.plango.api.service;
 
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
-import com.plango.api.dto.MemberDto;
-import com.plango.api.dto.UserDto;
+import com.plango.api.dto.member.MemberDto;
+import com.plango.api.dto.user.UserDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;

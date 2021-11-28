@@ -6,9 +6,10 @@ import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
-import com.plango.api.dto.MemberDto;
-import com.plango.api.dto.TravelDto;
-import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.member.MemberDto;
+import com.plango.api.dto.travel.CreateTravelDto;
+import com.plango.api.dto.travel.GetTravelDto;
+import com.plango.api.dto.member.TravelMembersDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -91,12 +92,12 @@ public class TravelService {
         return new TravelMembersDto(membersDto);
     }
 
-    public TravelDto getTravelByInvitationCode(String code) throws TravelNotFoundException {
+    public GetTravelDto getTravelByInvitationCode(String code) throws TravelNotFoundException {
         Travel travel = travelRepository.findByInvitationCode(code).orElse(null);
         if(travel == null){
             throw new TravelNotFoundException("No travel found with given code.");
         }
-        return convertToDto(travel);
+        return convertToGetDto(travel);
     }
 
     private void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
@@ -133,12 +134,12 @@ public class TravelService {
         return invitation;
     }
 
-    public Travel convertToEntity(TravelDto travelDto) {
+    public Travel convertCreateDtoToEntity(CreateTravelDto travelDto) {
         return modelMapper.map(travelDto, Travel.class);
     }
 
-    public TravelDto convertToDto(Travel travel) {
-        return modelMapper.map(travel, TravelDto.class);
+    public GetTravelDto convertToGetDto(Travel travel) {
+        return modelMapper.map(travel, GetTravelDto.class);
     }
 
 }

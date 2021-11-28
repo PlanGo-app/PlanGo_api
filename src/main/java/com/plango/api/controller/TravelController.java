@@ -1,8 +1,9 @@
 package com.plango.api.controller;
 
-import com.plango.api.dto.TravelDto;
+import com.plango.api.dto.travel.CreateTravelDto;
+import com.plango.api.dto.travel.GetTravelDto;
 
-import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.member.TravelMembersDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public interface TravelController {
 
     @PostMapping("")
-    ResponseEntity<String> createTravel(@RequestBody TravelDto newTravel);
+    ResponseEntity<String> createTravel(@RequestBody CreateTravelDto newTravel);
 
     @PostMapping("/{travelId}/member/{userId}")
     ResponseEntity<String> addMemberToTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestParam String role);
@@ -25,5 +26,5 @@ public interface TravelController {
     ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);
 
     @GetMapping("/invitation")
-    ResponseEntity<TravelDto> getTravelWithInvitation(@RequestParam String code);
+    ResponseEntity<GetTravelDto> getTravelWithInvitation(@RequestParam String code);
 }

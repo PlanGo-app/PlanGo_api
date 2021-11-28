@@ -1,8 +1,8 @@
 package com.plango.api.controller;
 
-import com.plango.api.dto.AuthDto;
-import com.plango.api.dto.CredentialDto;
-import com.plango.api.dto.UserDto;
+import com.plango.api.dto.authentication.AuthDto;
+import com.plango.api.dto.authentication.CredentialDto;
+import com.plango.api.dto.user.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,18 +1,16 @@
-package com.plango.api.dto;
-
-import java.time.LocalDateTime;
+package com.plango.api.dto.travel;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class TravelDto {
-    private Long id;
+public class CreateTravelDto {
     private String name;
     private String country;
     private String city;
     private LocalDateTime dateStart;
     private LocalDateTime dateEnd;
-    private String invitationCode;
 }
