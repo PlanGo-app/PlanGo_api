@@ -9,11 +9,15 @@ import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.dto.planningevent.PlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
+import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 import com.plango.api.repository.PlanningEventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanningEventService {
@@ -72,6 +76,15 @@ public class PlanningEventService {
     public void deletePlanningEventById(Long id) throws PlanningEventNotFoundException {
         findPlanningEventById(id);
         planningEventRepository.deleteById(id);
+    }
+
+    public List<GetPlanningEventDto> getPlanningEventByTravel(Travel travel) {
+        List<PlanningEvent> planningEventList = planningEventRepository.findAllByTravel(travel);
+        return planningEventList
+                .stream()
+                .map(planningEvent -> mapper.map(planningEvent, GetPlanningEventDto.class))
+                .collect(Collectors.toList());
+
     }
 
     private PlanningEvent findPlanningEventById(Long id) throws PlanningEventNotFoundException {

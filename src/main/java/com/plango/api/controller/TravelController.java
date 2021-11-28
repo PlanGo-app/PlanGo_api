@@ -3,6 +3,7 @@ package com.plango.api.controller;
 import com.plango.api.dto.TravelDto;
 
 import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.TravelPlanningEventDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,4 +27,7 @@ public interface TravelController {
 
     @GetMapping("/invitation")
     ResponseEntity<TravelDto> getTravelWithInvitation(@RequestParam String code);
+
+    @GetMapping("{travelId}/planningEvents")
+    ResponseEntity<TravelPlanningEventDto> getTravelPlanningEvents(@PathVariable Long travelId);
 }

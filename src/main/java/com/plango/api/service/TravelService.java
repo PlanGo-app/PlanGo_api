@@ -9,6 +9,8 @@ import com.plango.api.common.types.Role;
 import com.plango.api.dto.MemberDto;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.TravelPlanningEventDto;
+import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -29,6 +31,9 @@ public class TravelService {
 
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    PlanningEventService planningEventService;
 
     @Autowired
     IAuthenticationFacade authenticationFacade;
@@ -97,6 +102,15 @@ public class TravelService {
             throw new TravelNotFoundException("No travel found with given code.");
         }
         return convertToDto(travel);
+    }
+
+    public TravelPlanningEventDto getTravelPlanningEvents(Long travelId) throws TravelNotFoundException {
+        Travel travel = travelRepository.findById(travelId).orElse(null);
+        if(travel == null){
+            throw new TravelNotFoundException(String.format("No travel with id: %s were found", travelId));
+        }
+        List<GetPlanningEventDto> planningEventDtoList = planningEventService.getPlanningEventByTravel(travel);
+        return new TravelPlanningEventDto(planningEventDtoList);
     }
 
     private void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {
