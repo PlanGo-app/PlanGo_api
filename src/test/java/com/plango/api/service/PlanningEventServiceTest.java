@@ -1,9 +1,9 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.component.UserRight;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.*;
-import com.plango.api.common.types.Role;
 import com.plango.api.common.types.TransportType;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
@@ -16,11 +16,9 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.parameters.P;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +64,7 @@ class PlanningEventServiceTest {
     ModelMapper modelMapper;
 
     @Mock
-    MemberService memberService;
+    UserRight userRight;
 
     User currentUser;
     User notCurrentUser;
@@ -89,13 +87,13 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldReturnRequiredEntity() throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
+    void shouldReturnRequiredEntity_OnGetPlanningEvent_whenCurrentUserHasReadRight() throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
         //ARRANGE
         PlanningEvent planningEvent = buildPlanningEvent();
         GetPlanningEventDto expectedGetPlanningEventDto = buildExpectedGetPlanningEventDto();
         when(planningEventRepository.findById(EVENT_ID)).thenReturn(Optional.of(planningEvent));
         when(modelMapper.map(planningEvent, GetPlanningEventDto.class)).thenReturn(expectedGetPlanningEventDto);
-        when(memberService.isMember(currentUser, travel)).thenReturn(true);
+        when(userRight.currentUserCanRead(travel)).thenReturn(true);
 
         //ACT
         GetPlanningEventDto result = planningEventService.getPlanningEventById(EVENT_ID);
@@ -105,13 +103,13 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldThrowCUAException_WhenCurrentUserTryToGetPlanningEventAndIsNotMemberOfTravel() {
+    void shouldThrowCUAException_OnGetPlanningEvent_WhenCurrentUserHasNotReadRight() throws CurrentUserAuthorizationException {
         //ARRANGE
         PlanningEvent planningEvent = buildPlanningEvent();
         GetPlanningEventDto expectedGetPlanningEventDto = buildExpectedGetPlanningEventDto();
         when(planningEventRepository.findById(EVENT_ID)).thenReturn(Optional.of(planningEvent));
         when(modelMapper.map(planningEvent, GetPlanningEventDto.class)).thenReturn(expectedGetPlanningEventDto);
-        when(memberService.isMember(currentUser, travel)).thenReturn(false);
+        when(userRight.currentUserCanRead(travel)).thenReturn(false);
 
         //ACT
         //ASSERT
@@ -121,11 +119,12 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveNewEntity() throws UserNotFoundException, TravelNotFoundException, InvalidRequestDataException {
+    void shouldSaveNewEntity_onCreatePlanningEvent() throws UserNotFoundException, TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
         //ARRANGE
         CreatePlanningEventDto createPlanningEventDto = buildCreatePlanningEventDto();
-        when(travelService.getTravelById(anyLong())).thenReturn(new Travel());
+        when(travelService.getTravelById(anyLong())).thenReturn(travel);
         when(modelMapper.map(createPlanningEventDto, PlanningEvent.class)).thenReturn(buildMappedPlanningEventFromCreateDto());
+        when(userRight.currentUserCanWrite(travel)).thenReturn(true);
 
         //ACT
         planningEventService.createPlanningEvent(createPlanningEventDto);
@@ -137,10 +136,11 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveTheUpdatedEntityIfUserIsOwner() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException {
+    void shouldSaveTheUpdatedEntity_onUpdatePlanningEvent_whenCurrentUserHasWriteRight() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException {
         //ARRANGE
         UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
         when(planningEventRepository.findById(1L)).thenReturn(Optional.of(buildPlanningEvent()));
+        when(userRight.currentUserCanWrite(travel)).thenReturn(true);
 
         //ACT
         planningEventService.updatePlanningEvent(updatePlanningEventDto);
@@ -152,34 +152,14 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveTheUpdatedEntityIfUserIsAdminOfBelongingTravel() throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException, UserNotFoundException {
-        //ARRANGE
-        UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
-        when(planningEventRepository.findById(1L)).thenReturn(Optional.of(buildPlanningEventNotCurrentUser()));
-        Member member = new Member();
-        member.setRole(Role.ADMIN);
-        when(memberService.getMemberByTravel(travel, currentUser)).thenReturn(member);
-
-        //ACT
-        planningEventService.updatePlanningEvent(updatePlanningEventDto);
-
-        //ASSERT
-        verify(planningEventRepository).save(planningEventCaptor.capture());
-        PlanningEvent planningEventSaved = planningEventCaptor.getValue();
-        assertThat(planningEventSaved).usingRecursiveComparison().isEqualTo(buildExpectedUpdatedPlanningEventNotCurrentUser());
-    }
-
-    @Test
-    void shouldThrowCUAException_WhenCurrentUserTryToUpdatePlanningEventAndIsNotOrganizerOrAdmin() throws UserNotFoundException {
+    void shouldThrowCUAException_onUpdatePlanningEvent_whenCurrentUserHasNotWriteRight() throws CurrentUserAuthorizationException {
         //ARRANGE
         //ARRANGE
         UpdatePlanningEventDto updatePlanningEventDto = buildUpdatePlanningEventDto();
         PlanningEvent planningEventOfAnotherUser = buildPlanningEvent();
         planningEventOfAnotherUser.setCreatedBy(new User());
         when(planningEventRepository.findById(1L)).thenReturn(Optional.of(planningEventOfAnotherUser));
-        Member member = new Member();
-        member.setRole(Role.OBSERVER);
-        when(memberService.getMemberByTravel(travel, currentUser)).thenReturn(member);
+        when(userRight.currentUserCanWrite(travel)).thenReturn(false);
 
         //ACT
         //ASSERT

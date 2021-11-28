@@ -1,5 +1,6 @@
 package com.plango.api.common.component;
 
+import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.entity.User;
@@ -24,7 +25,7 @@ public class AuthenticationFacade implements IAuthenticationFacade {
         if(userAuth instanceof UserAuthDetails) {
             return (UserAuthDetails) userAuth;
         } else {
-            throw new CurrentUserAuthorizationException("Could not find current user");
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
         }
     }
 
@@ -34,7 +35,7 @@ public class AuthenticationFacade implements IAuthenticationFacade {
             return userService.getUserByPseudo(currentUserAuth.getUsername());
         }
         catch(CurrentUserAuthorizationException | UserNotFoundException e){
-            throw new UserNotFoundException("Couldn't find current user.");
+            throw new UserNotFoundException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
         }
     }
 }
