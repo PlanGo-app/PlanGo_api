@@ -61,6 +61,10 @@ public class MemberService {
         return memberDto;
     }
 
+    public boolean isMember(User user, Travel travel) {
+        return memberRepository.findByTravelAndUserMember(travel, user).orElse(null) != null;
+    }
+
     public Member convertToEntity(MemberDto memberDto) {
         return modelMapper.map(memberDto, Member.class);
     }

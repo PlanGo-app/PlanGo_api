@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -29,6 +30,12 @@ public class PlanningEvent extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "pin")
     private Pin pin;
+
+    @Column(name = "date_start")
+    private LocalDateTime dateStart;
+
+    @Column(name = "date_end")
+    private LocalDateTime dateEnd;
 
     private TransportType transportTypeToNext;
 
