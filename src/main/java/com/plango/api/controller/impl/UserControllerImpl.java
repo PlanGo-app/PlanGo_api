@@ -9,7 +9,6 @@ import com.plango.api.dto.travel.UserTravelsDto;
 import com.plango.api.dto.user.UserDto;
 import com.plango.api.dto.user.UserUpdateDto;
 import com.plango.api.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +21,6 @@ public class UserControllerImpl implements UserController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    ModelMapper modelMapper;
 
     /**
      * Get information of the current user
