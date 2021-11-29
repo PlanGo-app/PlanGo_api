@@ -59,10 +59,10 @@ public class UserService {
     }
 
     public void createUser(UserDto userDto) throws UserAlreadyExistsException {
-        userDto.setEmail(userDto.getEmail().toLowerCase());
         if ( pseudoTaken(userDto.getPseudo()) || emailTaken(userDto.getEmail().toLowerCase()) ){
             throw new UserAlreadyExistsException(ExceptionMessage.PSEUDO_EMAIL_TAKEN);
         } else {
+            userDto.setEmail(userDto.getEmail().toLowerCase());
             userRepository.save(convertUserDtoToEntity(userDto));
         }
     }
