@@ -1,15 +1,14 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.component.UserRight;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.*;
-import com.plango.api.common.types.Role;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.dto.planningevent.PlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
-import com.plango.api.entity.User;
 import com.plango.api.repository.PlanningEventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +23,17 @@ public class PlanningEventService {
     TravelService travelService;
 
     @Autowired
-    MemberService memberService;
+    IAuthenticationFacade authenticationFacade;
 
     @Autowired
-    IAuthenticationFacade authenticationFacade;
+    UserRight userRight;
 
     @Autowired
     ModelMapper mapper;
 
     public GetPlanningEventDto getPlanningEventById(Long id) throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
         PlanningEvent planningEvent = findPlanningEventById(id);
-        if(!userCanRead(planningEvent)) {
+        if(!userRight.currentUserCanRead(planningEvent.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PLANNING_EVENT);
         }
         return mapper.map(planningEvent, GetPlanningEventDto.class);
@@ -57,7 +56,7 @@ public class PlanningEventService {
             throw new InvalidRequestDataException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
         }
         PlanningEvent planningEventOnUpdate = findPlanningEventById(updatePlanningEventDto.getId());
-        if(!userCanWrite(planningEventOnUpdate)) {
+        if(!userRight.currentUserCanWrite(planningEventOnUpdate.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PLANNING_EVENT);
         }
         planningEventOnUpdate.setName(updatePlanningEventDto.getName());
@@ -84,34 +83,5 @@ public class PlanningEventService {
 
     private boolean endDateIsBeforeStartDate(PlanningEventDto planningEventDto) {
         return planningEventDto.getDateEnd().isBefore(planningEventDto.getDateStart());
-    }
-
-    private boolean userCanWrite(PlanningEvent planningEvent) throws CurrentUserAuthorizationException {
-        try {
-            User user = authenticationFacade.getCurrentUser();
-            if(planningEvent.getCreatedBy().equals(user)) {
-                return true;
-            }
-            Role currentUserRole = memberService.getMemberByTravel(planningEvent.getTravel(), user).getRole();
-            if (currentUserRole.equals(Role.ADMIN) || currentUserRole.equals(Role.ORGANIZER)) {
-                return true;
-            } else {
-                throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PLANNING_EVENT);
-            }
-        } catch (UserNotFoundException e) {
-            throw new CurrentUserAuthorizationException(e.getMessage());
-        }
-    }
-
-    private boolean userCanRead(PlanningEvent planningEvent) throws CurrentUserAuthorizationException {
-        try {
-            User user = authenticationFacade.getCurrentUser();
-            if(!memberService.isMember(user, planningEvent.getTravel())) {
-                throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PLANNING_EVENT);
-            }
-        } catch (UserNotFoundException e) {
-            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
-        }
-        return true;
     }
 }
