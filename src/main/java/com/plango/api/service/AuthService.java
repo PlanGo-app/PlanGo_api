@@ -35,7 +35,7 @@ public class AuthService {
 
     public AuthDto getLogin(CredentialDto credentials) throws AuthenticationException, UserNotFoundException {
 
-    	UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
+    	UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getPseudo(), credentials.getPassword());
     		
     	Authentication auth = authenticationManager.authenticate(upat);
         SecurityContextHolder.getContext().setAuthentication(auth);

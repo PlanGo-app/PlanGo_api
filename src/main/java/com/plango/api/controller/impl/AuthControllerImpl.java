@@ -52,7 +52,7 @@ public class AuthControllerImpl implements AuthController {
 
         // connect user to the applications
         CredentialDto connect = new CredentialDto();
-        connect.setUsername(userDto.getPseudo());
+        connect.setPseudo(userDto.getPseudo());
         connect.setPassword(decodePwd);
         try {
             return new ResponseEntity<>(authService.getLogin(connect), HttpStatus.OK);
