@@ -9,6 +9,7 @@ import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
 import com.plango.api.dto.TravelDto;
 import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.TravelPlanningEventDto;
 import com.plango.api.entity.Travel;
 
 import com.plango.api.entity.User;
@@ -127,6 +128,16 @@ public class TravelControllerImpl implements TravelController {
         }
         catch(TravelNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public ResponseEntity<TravelPlanningEventDto> getTravelPlanningEvents(Long travelId) {
+        try {
+            TravelPlanningEventDto travelPlanningEventDto = travelService.getTravelPlanningEvents(travelId);
+            return ResponseEntity.ok(travelPlanningEventDto);
+        } catch (TravelNotFoundException e) {
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
