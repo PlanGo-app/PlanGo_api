@@ -50,7 +50,7 @@ public class UserService {
     public User getUserById(Long userId) throws UserNotFoundException {
         User user = userRepository.findById(userId).orElse(null);
         if(user == null){
-            throw new UserNotFoundException(String.format("No user with id: %d were found", userId));
+            throw new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND);
         }
         return user;
     }
@@ -58,7 +58,7 @@ public class UserService {
     public User getUserByPseudo(String pseudo) throws UserNotFoundException {
         User user = userRepository.findByPseudo(pseudo).orElse(null);
         if(user == null){
-            throw new UserNotFoundException(String.format("No user with pseudo: %s were found", pseudo));
+            throw new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND);
         }
         return user;
     }

@@ -22,4 +22,6 @@ public final class ExceptionMessage {
     public static final String DATE_START_SHOULD_BE_BEFORE_DATE_END = "Date start of the planning event should be before its date end";
     public static final String USER_ALREADY_EXISTS = "User account already exists";
     public static final String PSEUDO_EMAIL_TAKEN = "Pseudo or email already taken";
+    public static final String MISSING_OR_WRONG_ARGUMENTS_FOR_TRAVEL_CREATION = "Couldn't create travel because of missing or wrong informations.";
+    public static final String USER_NOT_FOUND = "User not found";
 }

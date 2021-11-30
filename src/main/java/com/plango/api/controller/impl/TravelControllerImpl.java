@@ -1,6 +1,7 @@
 package com.plango.api.controller.impl;
 
 import com.jayway.jsonpath.spi.mapper.MappingException;
+import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserIsAlreadyMemberException;
@@ -91,16 +92,14 @@ public class TravelControllerImpl implements TravelController {
         try {
             Travel travel = travelService.getTravelById(travelId);
             User user = userService.getUserById(userId);
-            if(role.equals("ADMIN") || role.equals("ORGANIZER") || role.equals("OBSERVER")) {
-                travelService.updateMember(travel, user, Role.valueOf(role));
-                return new ResponseEntity<>(String.format("Member updated with %s role.", role), HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.BAD_REQUEST);
-            }
+            travelService.updateMember(travel, user, Role.valueOf(role));
+            return new ResponseEntity<>(String.format("Member updated with %s role.", role), HttpStatus.OK);
         }
         catch (TravelNotFoundException | UserNotFoundException e) {
-            return new ResponseEntity<>("Couldn't modify travel's member because travel or user were not found.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch(IllegalArgumentException e) {
+            return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.NOT_FOUND);
         }
         catch(CurrentUserAuthorizationException e){
             return new ResponseEntity<>("Current user not authorized to modify a member's role for current travel.", HttpStatus.FORBIDDEN);
