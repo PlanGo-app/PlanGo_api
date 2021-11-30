@@ -10,7 +10,6 @@ import com.plango.api.dto.planningevent.PlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.Travel;
-import com.plango.api.entity.User;
 import com.plango.api.repository.PlanningEventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,6 @@ public class PlanningEventService {
                 .stream()
                 .map(planningEvent -> mapper.map(planningEvent, GetPlanningEventDto.class))
                 .collect(Collectors.toList());
-
     }
 
     private PlanningEvent findPlanningEventById(Long id) throws PlanningEventNotFoundException {

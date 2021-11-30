@@ -30,7 +30,7 @@ public class PlanningEventControllerImpl implements PlanningEventController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
             log.error(e.getMessage(), e);
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -44,7 +44,7 @@ public class PlanningEventControllerImpl implements PlanningEventController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
             log.error(e.getMessage(), e);
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (InvalidRequestDataException e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
