@@ -97,7 +97,7 @@ class UserServiceTest {
         when(authenticationFacade.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
     
         assertThatExceptionOfType(CurrentUserAuthorizationException.class)
-                .isThrownBy(() -> userService.getCurrentUser())
+                .isThrownBy(() -> userService.getCurrentUserDto())
                 .withMessage(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
     }
 
@@ -106,7 +106,7 @@ class UserServiceTest {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         when(userService.convertUserEntityToDto(currentUser)).thenReturn(currentUserDto);
         
-        UserDto responseDto = userService.getCurrentUser();
+        UserDto responseDto = userService.getCurrentUserDto();
 
         verify(authenticationFacade).getCurrentUser();
         verify(modelMapper).map(currentUser, UserDto.class);

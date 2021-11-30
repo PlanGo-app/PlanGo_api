@@ -56,21 +56,21 @@ class UserControllerTest {
 
     @Test
     void currentUserNotFound() throws CurrentUserAuthorizationException {
-        when(userService.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
+        when(userService.getCurrentUserDto()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
 
         ResponseEntity<UserDto> response = userController.getCurrentUser();
 
-        verify(userService).getCurrentUser();
+        verify(userService).getCurrentUserDto();
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     void currentUserFound() throws CurrentUserAuthorizationException {
-        when(userService.getCurrentUser()).thenReturn(currentUserDto);
+        when(userService.getCurrentUserDto()).thenReturn(currentUserDto);
 
         ResponseEntity<UserDto> response = userController.getCurrentUser();
 
-        verify(userService).getCurrentUser();
+        verify(userService).getCurrentUserDto();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(currentUserDto, response.getBody());
     }

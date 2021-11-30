@@ -30,7 +30,7 @@ public class UserControllerImpl implements UserController {
     @Override
     public ResponseEntity<UserDto> getCurrentUser() {
         try {
-            UserDto userDto = userService.getCurrentUser();
+            UserDto userDto = userService.getCurrentUserDto();
             return new ResponseEntity<>(userDto, HttpStatus.OK);
         } catch (CurrentUserAuthorizationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

@@ -39,8 +39,12 @@ public class UserService {
     @Autowired
     MemberService memberService;
 
-    public UserDto getCurrentUser() throws CurrentUserAuthorizationException {
+    public UserDto getCurrentUserDto() throws CurrentUserAuthorizationException {
         return convertUserEntityToDto(authenticationFacade.getCurrentUser());
+    }
+
+    public User getCurrentUser() throws CurrentUserAuthorizationException {
+        return authenticationFacade.getCurrentUser();
     }
 
     public User getUserById(Long userId) throws UserNotFoundException {
@@ -100,10 +104,6 @@ public class UserService {
 
     public UserDto convertUserEntityToDto(User user) {
         return modelMapper.map(user, UserDto.class);
-    }
-
-    public User convertUserDtoToEntity(UserBaseDto userDto) {
-        return modelMapper.map(userDto, User.class);
     }
 
     public User convertUserDtoToEntityWithPasswordEncoding(UserBaseDto userDto) {

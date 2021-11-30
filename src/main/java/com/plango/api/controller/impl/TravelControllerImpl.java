@@ -1,6 +1,5 @@
 package com.plango.api.controller.impl;
 
-
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
@@ -21,6 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class TravelControllerImpl implements TravelController {
 
@@ -124,10 +126,11 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<GetTravelDto> addMemberToTravelWithInvitation(String code) {
         try {
             GetTravelDto travelFound = travelService.getTravelByInvitationCode(code);
-            travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.convertUserDtoToEntity(userService.getCurrentUser()), Role.OBSERVER);
+            travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.getCurrentUser(), Role.OBSERVER);
             return new ResponseEntity<>(travelFound, HttpStatus.OK);
         }
         catch(TravelNotFoundException | UserNotFoundException | CurrentUserAuthorizationException e){
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
