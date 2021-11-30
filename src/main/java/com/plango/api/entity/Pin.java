@@ -7,8 +7,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.postgresql.geometric.PGpoint;
-
 @Setter
 @Getter
 @Entity
@@ -17,13 +15,21 @@ public class Pin extends BaseEntity {
     private String name;
 
     @NotNull
-    @Column(name = "localisation")
-    private PGpoint point;
+    @Column(name = "longitude")
+    private Float longitude;
+
+    @NotNull
+    @Column(name = "latitude")
+    private Float latitude;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
+
+    @OneToOne
+    @JoinColumn(name = "planning_event")
+    private PlanningEvent planningEvent;
 
     @NotNull
     @ManyToOne
