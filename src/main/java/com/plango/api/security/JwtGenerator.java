@@ -21,7 +21,6 @@ public class JwtGenerator {
         return Jwts.builder()
                     .setSubject(userAuthDetails.getUsername())
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 850000))
                     .signWith(SignatureAlgorithm.HS512, secretKey)
                     .compact();
     }
