@@ -18,12 +18,8 @@ public class UserRight {
     IAuthenticationFacade authenticationFacade;
 
     public boolean currentUserCanRead(Travel travel) throws CurrentUserAuthorizationException {
-        try {
-            User user = authenticationFacade.getCurrentUser();
-            return memberService.isMember(user, travel);
-        } catch (UserNotFoundException e) {
-            throw new CurrentUserAuthorizationException(e.getMessage());
-        }
+        User user = authenticationFacade.getCurrentUser();
+        return memberService.isMember(user, travel);
     }
 
     public boolean currentUserCanWrite(Travel travel) throws CurrentUserAuthorizationException {

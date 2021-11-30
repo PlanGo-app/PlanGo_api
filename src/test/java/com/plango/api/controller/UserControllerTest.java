@@ -1,8 +1,8 @@
 package com.plango.api.controller;
 
 import com.plango.api.common.constant.ExceptionMessage;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
-import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.impl.UserControllerImpl;
 import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.user.UserDto;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserControllerTest {
+class UserControllerTest {
 
     @InjectMocks
     UserControllerImpl userController;
@@ -42,7 +42,7 @@ public class UserControllerTest {
     private static final String UPDATE_USER_EMAIL = "user@test.com";
 
     @BeforeEach
-    public void init() {
+    void init() {
         MockitoAnnotations.openMocks(this);
         currentUserDto = new UserDto();
         currentUserDto.setPseudo(CURRENT_USER_PSEUDO);
@@ -50,22 +50,22 @@ public class UserControllerTest {
         updateDto.setEmail(UPDATE_USER_EMAIL);
         oneTravel = new GetTravelDto();
         oneTravel.setId(TRAVEL_DTO_ID);
-        listTravels = new ArrayList();
+        listTravels = new ArrayList<>();
         listTravels.add(oneTravel);
     }
 
     @Test
-    public void currentUserNotFound() throws UserNotFoundException {
-        when(userService.getCurrentUser()).thenThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND));
+    void currentUserNotFound() throws CurrentUserAuthorizationException {
+        when(userService.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
 
         ResponseEntity<UserDto> response = userController.getCurrentUser();
 
         verify(userService).getCurrentUser();
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    public void currentUserFound() throws UserNotFoundException {
+    void currentUserFound() throws CurrentUserAuthorizationException {
         when(userService.getCurrentUser()).thenReturn(currentUserDto);
 
         ResponseEntity<UserDto> response = userController.getCurrentUser();
@@ -76,7 +76,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserThatAlreadyExists() throws UserAlreadyExistsException {
+    void createUserThatAlreadyExists() throws UserAlreadyExistsException {
         doThrow(new UserAlreadyExistsException(ExceptionMessage.PSEUDO_EMAIL_TAKEN)).when(userService).createUser(currentUserDto);
 
         ResponseEntity<String> response = userController.createUser(currentUserDto);
@@ -86,7 +86,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserThatDoesntExist() throws UserAlreadyExistsException {
+    void createUserThatDoesntExist() throws UserAlreadyExistsException {
         ResponseEntity<String> response = userController.createUser(currentUserDto);
 
         verify(userService).createUser(currentUserDto);
@@ -95,17 +95,17 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateCurrentUserNotFound() throws UserNotFoundException {
-        doThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND)).when(userService).updateUser(updateDto);
+    void updateCurrentUserNotFound() throws CurrentUserAuthorizationException {
+        doThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED)).when(userService).updateUser(updateDto);
 
         ResponseEntity<String> response = userController.updateCurrentUser(updateDto);
 
         verify(userService).updateUser(updateDto);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    public void updateCurrentUserFound() throws UserNotFoundException {
+    void updateCurrentUserFound() throws CurrentUserAuthorizationException {
         ResponseEntity<String> response = userController.updateCurrentUser(updateDto);
         
         verify(userService).updateUser(updateDto);
@@ -113,17 +113,17 @@ public class UserControllerTest {
     }
 
     @Test
-    public void deleteCurrentUserNotFound() throws UserNotFoundException {
-        doThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND)).when(userService).deleteCurrentUser();
+    void deleteCurrentUserNotFound() throws CurrentUserAuthorizationException {
+        doThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED)).when(userService).deleteCurrentUser();
 
         ResponseEntity<String> response = userController.deleteCurrentUser();
 
         verify(userService).deleteCurrentUser();
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    public void deleteCurrentUserFound() throws UserNotFoundException {
+    void deleteCurrentUserFound() throws CurrentUserAuthorizationException {
         ResponseEntity<String> response = userController.deleteCurrentUser();
         
         verify(userService).deleteCurrentUser();
@@ -131,17 +131,17 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getTravelsOfCurrentUserNotFound() throws UserNotFoundException {
-        doThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND)).when(userService).getTravels();
+    void getTravelsOfCurrentUserNotFound() throws  CurrentUserAuthorizationException {
+        doThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED)).when(userService).getTravels();
 
         ResponseEntity<UserTravelsDto> response = userController.getTravelsOfCurrentUser();
 
         verify(userService).getTravels();
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    public void getTravelsOfCurrentUserFound() throws UserNotFoundException {
+    void getTravelsOfCurrentUserFound() throws CurrentUserAuthorizationException {
         when(userService.getTravels()).thenReturn(listTravels);
 
         ResponseEntity<UserTravelsDto> response = userController.getTravelsOfCurrentUser();

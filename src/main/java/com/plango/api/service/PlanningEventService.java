@@ -10,7 +10,6 @@ import com.plango.api.dto.planningevent.PlanningEventDto;
 import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.Travel;
-import com.plango.api.entity.User;
 import com.plango.api.repository.PlanningEventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class PlanningEventService {
         return mapper.map(planningEvent, GetPlanningEventDto.class);
     }
 
-    public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws UserNotFoundException, TravelNotFoundException, InvalidRequestDataException {
+    public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
         if(endDateIsBeforeStartDate(createPlanningEventDto)) {
             throw new InvalidRequestDataException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
         } else if (createPlanningEventDto.getPin() == null) {

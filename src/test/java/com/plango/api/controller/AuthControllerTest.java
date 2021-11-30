@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.impl.AuthControllerImpl;
 import com.plango.api.dto.authentication.AuthDto;
@@ -20,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @InjectMocks
     private AuthControllerImpl authController;
@@ -53,17 +54,17 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void loginWhenBadCredentials() throws UserNotFoundException {
+    void loginWhenBadCredentials() throws CurrentUserAuthorizationException {
         when(authService.getLogin(credentials)).thenThrow(new BadCredentialsException(anyString()));
 
         ResponseEntity<AuthDto> response = authController.login(credentials);
 
         verify(authService).getLogin(credentials);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
-    public void loginWithValidUser() throws UserNotFoundException {
+    void loginWithValidUser() throws CurrentUserAuthorizationException {
         when(authService.getLogin(credentials)).thenReturn(newAuth);
 
         ResponseEntity<AuthDto> response = authController.login(credentials);
@@ -74,18 +75,18 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void signUpWithUserThatAlreadyExists() {
+    void signUpWithUserThatAlreadyExists() {
         when(authService.createNewUser(newUser)).thenReturn(false);
 
         ResponseEntity<AuthDto> response = authController.signup(newUser);
 
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
     @Test
-    public void signUpButCannotLogin() throws UserNotFoundException {
+    void signUpButCannotLogin() throws CurrentUserAuthorizationException {
         when(authService.createNewUser(newUser)).thenReturn(true);
-        when(authService.getLogin(any(CredentialDto.class))).thenThrow(new UserNotFoundException(""));
+        when(authService.getLogin(any(CredentialDto.class))).thenThrow(new CurrentUserAuthorizationException(""));
 
         ResponseEntity<AuthDto> response = authController.signup(newUser);
 
@@ -95,7 +96,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void signUpAndCanLogin() throws UserNotFoundException {
+    void signUpAndCanLogin() throws CurrentUserAuthorizationException {
         when(authService.createNewUser(newUser)).thenReturn(true);
         when(authService.getLogin(any(CredentialDto.class))).thenReturn(newAuth);
 

@@ -1,8 +1,8 @@
 package com.plango.api.controller.impl;
 
 import com.plango.api.common.constant.ExceptionMessage;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
-import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
 
 import com.plango.api.dto.travel.GetTravelDto;
@@ -32,8 +32,8 @@ public class UserControllerImpl implements UserController {
         try {
             UserDto userDto = userService.getCurrentUser();
             return new ResponseEntity<>(userDto, HttpStatus.OK);
-        } catch (UserNotFoundException unfe) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -62,8 +62,8 @@ public class UserControllerImpl implements UserController {
         try {
             userService.updateUser(userUpdateDto);
             return new ResponseEntity<>("Current user updated", HttpStatus.OK);
-        } catch (UserNotFoundException unfe) {
-            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 
@@ -75,8 +75,8 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<String> deleteCurrentUser() {
         try {
             userService.deleteCurrentUser();
-        } catch (UserNotFoundException unfe) {
-            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (CurrentUserAuthorizationException unfe) {
+            return new ResponseEntity<>(unfe.getMessage(), HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>("Current user deleted", HttpStatus.OK);
     }
@@ -91,8 +91,8 @@ public class UserControllerImpl implements UserController {
             List<GetTravelDto> travels = userService.getTravels();
             return new ResponseEntity<>(new UserTravelsDto(travels), HttpStatus.OK);
         }
-        catch(UserNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        catch(CurrentUserAuthorizationException e){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 }

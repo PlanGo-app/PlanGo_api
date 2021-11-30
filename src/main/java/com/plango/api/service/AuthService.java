@@ -1,9 +1,8 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
-import com.plango.api.common.exception.UserNotFoundException;
-import com.plango.api.controller.UserController;
 import com.plango.api.dto.authentication.AuthDto;
 import com.plango.api.dto.authentication.CredentialDto;
 import com.plango.api.dto.user.UserDto;
@@ -32,7 +31,7 @@ public class AuthService {
     @Autowired
     IAuthenticationFacade authenticationFacade;
 
-    public AuthDto getLogin(CredentialDto credentials) throws AuthenticationException, UserNotFoundException {
+    public AuthDto getLogin(CredentialDto credentials) throws AuthenticationException, CurrentUserAuthorizationException {
 
     	UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(credentials.getPseudo(), credentials.getPassword());
     		

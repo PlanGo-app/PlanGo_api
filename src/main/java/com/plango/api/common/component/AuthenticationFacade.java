@@ -29,13 +29,13 @@ public class AuthenticationFacade implements IAuthenticationFacade {
         }
     }
 
-    public User getCurrentUser() throws UserNotFoundException {
+    public User getCurrentUser() throws CurrentUserAuthorizationException {
         try {
             UserAuthDetails currentUserAuth = this.getCurrentUserAuthDetails();
             return userService.getUserByPseudo(currentUserAuth.getUsername());
         }
-        catch(CurrentUserAuthorizationException | UserNotFoundException e){
-            throw new UserNotFoundException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
+        catch(UserNotFoundException e){
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
         }
     }
 }
