@@ -7,6 +7,7 @@ import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.user.UserBaseDto;
 import com.plango.api.dto.user.UserDto;
 import com.plango.api.dto.user.UserUpdateDto;
+import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -57,13 +58,11 @@ public class UserService {
         return user;
     }
 
-    public void createUser(UserDto userDto)  throws UserAlreadyExistsException {
-        userDto.setEmail(userDto.getEmail().toLowerCase());
-        if ( pseudoTaken(userDto.getPseudo()) ){
-            throw new UserAlreadyExistsException("Pseudo already taken");
-        } else if ( emailTaken(userDto.getEmail().toLowerCase()) ) {
-            throw new UserAlreadyExistsException("Email already taken");
+    public void createUser(UserDto userDto) throws UserAlreadyExistsException {
+        if ( pseudoTaken(userDto.getPseudo()) || emailTaken(userDto.getEmail().toLowerCase()) ){
+            throw new UserAlreadyExistsException(ExceptionMessage.PSEUDO_EMAIL_TAKEN);
         } else {
+            userDto.setEmail(userDto.getEmail().toLowerCase());
             userRepository.save(convertUserDtoToEntity(userDto));
         }
     }

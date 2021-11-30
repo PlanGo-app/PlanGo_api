@@ -1,5 +1,6 @@
 package com.plango.api.controller.impl;
 
+import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
@@ -9,7 +10,6 @@ import com.plango.api.dto.travel.UserTravelsDto;
 import com.plango.api.dto.user.UserDto;
 import com.plango.api.dto.user.UserUpdateDto;
 import com.plango.api.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +22,6 @@ public class UserControllerImpl implements UserController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    ModelMapper modelMapper;
 
     /**
      * Get information of the current user
@@ -50,7 +47,7 @@ public class UserControllerImpl implements UserController {
         try {
             userService.createUser(userDto);
         } catch(UserAlreadyExistsException e){
-            return new ResponseEntity<>("Pseudo or email already taken.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ExceptionMessage.PSEUDO_EMAIL_TAKEN, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(String.format("User %s created", userDto.getPseudo()), HttpStatus.CREATED);
     }
