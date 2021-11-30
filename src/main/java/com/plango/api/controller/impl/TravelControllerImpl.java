@@ -121,12 +121,13 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<GetTravelDto> getTravelWithInvitation(String code) {
+    public ResponseEntity<GetTravelDto> addMemberToTravelWithInvitation(String code) {
         try {
             GetTravelDto travelFound = travelService.getTravelByInvitationCode(code);
+            travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.convertUserDtoToEntity(userService.getCurrentUser()), Role.OBSERVER);
             return new ResponseEntity<>(travelFound, HttpStatus.OK);
         }
-        catch(TravelNotFoundException e){
+        catch(TravelNotFoundException | UserNotFoundException | CurrentUserAuthorizationException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
