@@ -25,8 +25,8 @@ public interface TravelController {
     @GetMapping("/{travelId}/members")
     ResponseEntity<TravelMembersDto> getTravelMembers(@PathVariable Long travelId);
 
-    @GetMapping("/invitation")
-    ResponseEntity<GetTravelDto> getTravelWithInvitation(@RequestParam String code);
+    @PostMapping("/invitation")
+    ResponseEntity<GetTravelDto> addMemberToTravelWithInvitation(@RequestParam String code);
 
     @GetMapping("{travelId}/planningEvents")
     ResponseEntity<TravelPlanningEventDto> getTravelPlanningEvents(@PathVariable Long travelId);
