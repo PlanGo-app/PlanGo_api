@@ -38,7 +38,7 @@ class UserRightTest {
     Travel travel;
 
     @BeforeEach
-    void setUp() throws UserNotFoundException {
+    void setUp() throws CurrentUserAuthorizationException {
         MockitoAnnotations.openMocks(this);
         currentUser = new User();
         currentUser.setId(CURRENT_USER_ID);

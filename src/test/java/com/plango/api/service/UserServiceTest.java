@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.constant.ExceptionMessage;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
@@ -31,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class UserServiceTest {
+class UserServiceTest {
 
     @InjectMocks
     UserService userService;
@@ -72,7 +73,7 @@ public class UserServiceTest {
 
 
     @BeforeEach
-    public void init() {
+    void init() {
         MockitoAnnotations.openMocks(this);
         currentUser = buildCurrentUser();
         currentUserDto = buildCurrentUserDto();
@@ -84,24 +85,24 @@ public class UserServiceTest {
         updatedCurrentUser.setEmail(USER_EMAIL_UPDATE);
         updatedCurrentUser.setPassword(USER_PWD_UPDATE);
         oneTravelDto = buildTravelDto();
-        listTravelDto = new ArrayList();
+        listTravelDto = new ArrayList<>();
         listTravelDto.add(oneTravelDto);
         oneMember = buildMember();
-        listMember = new ArrayList();
+        listMember = new ArrayList<>();
         listMember.add(oneMember);
     }
 
     @Test
-    public void cannotGetCurrentUser_NotFound() throws UserNotFoundException {
-        when(authenticationFacade.getCurrentUser()).thenThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND));
+    void cannotGetCurrentUser_NotFound() throws CurrentUserAuthorizationException {
+        when(authenticationFacade.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
     
-        assertThatExceptionOfType(UserNotFoundException.class)
+        assertThatExceptionOfType(CurrentUserAuthorizationException.class)
                 .isThrownBy(() -> userService.getCurrentUser())
-                .withMessage(ExceptionMessage.CURRENT_USER_NOT_FOUND);
+                .withMessage(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
     }
 
     @Test
-    public void getCurrentUser_ConvertedIntoDto() throws UserNotFoundException {
+    void getCurrentUser_ConvertedIntoDto() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         when(userService.convertUserEntityToDto(currentUser)).thenReturn(currentUserDto);
         
@@ -113,7 +114,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void cannotGetUserById_NotFound() throws UserNotFoundException {
+    void cannotGetUserById_NotFound() {
         when(userRepository.findById(USER_THAT_DOESNT_EXIST_ID)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(UserNotFoundException.class)
@@ -122,7 +123,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserById() throws UserNotFoundException {
+    void getUserById() throws UserNotFoundException {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         User user = userService.getUserById(CURRENT_USER_ID);
@@ -130,7 +131,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void cannotGetUserByPseudo_NotFound() throws UserNotFoundException {
+    void cannotGetUserByPseudo_NotFound() {
         when(userRepository.findByPseudo(USER_THAT_DOESNT_EXIST_PSEUDO)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(UserNotFoundException.class)
@@ -139,7 +140,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByPseudo() throws UserNotFoundException {
+    void getUserByPseudo() throws UserNotFoundException {
         when(userRepository.findByPseudo(USER_THAT_DOESNT_EXIST_PSEUDO)).thenReturn(Optional.of(currentUser));
 
         User user = userService.getUserByPseudo(USER_THAT_DOESNT_EXIST_PSEUDO);
@@ -147,7 +148,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUserThatAlreadyExists() throws UserAlreadyExistsException {
+    void createUserThatAlreadyExists() {
         when(userRepository.findByPseudo(CURRENT_USER_PSEUDO_PASSWORD)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(CURRENT_USER_EMAIL)).thenReturn(Optional.of(currentUser));
 
@@ -161,7 +162,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUserThatDoesntAlreadyExists() throws UserAlreadyExistsException {
+    void createUserThatDoesntAlreadyExists() throws UserAlreadyExistsException {
         when(userRepository.findByPseudo(CURRENT_USER_PSEUDO_PASSWORD)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(CURRENT_USER_EMAIL)).thenReturn(Optional.empty());
         when(modelMapper.map(currentUserDto, User.class)).thenReturn(currentUser);
@@ -175,7 +176,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateUser_ThatExistsWithEmailAndPasswordModified() throws UserNotFoundException {
+    void updateUser_ThatExistsWithEmailAndPasswordModified() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         when(encoder.encode(USER_PWD_UPDATE)).thenReturn(USER_PWD_UPDATE);
 
@@ -186,7 +187,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateUser_ThatExistsWithoutModifications() throws UserNotFoundException {
+    void updateUser_ThatExistsWithoutModifications() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         userService.updateUser(userUpdateDto_WithoutModif);
         verify(authenticationFacade).getCurrentUser();
@@ -194,38 +195,38 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateUser_ThatDoesntExist() throws UserNotFoundException {
-        when(authenticationFacade.getCurrentUser()).thenThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND));
-        assertThatExceptionOfType(UserNotFoundException.class)
+    void updateUser_ThatDoesntExist() throws CurrentUserAuthorizationException {
+        when(authenticationFacade.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
+        assertThatExceptionOfType(CurrentUserAuthorizationException.class)
                 .isThrownBy(() -> userService.updateUser(userUpdateDto_WithModif))
-                .withMessage(ExceptionMessage.CURRENT_USER_NOT_FOUND);
+                .withMessage(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
     }
 
     @Test
-    public void deleteCurrentUser_ButDoesntExist() throws UserNotFoundException {
-        when(authenticationFacade.getCurrentUser()).thenThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND));
-        assertThatExceptionOfType(UserNotFoundException.class)
+    void deleteCurrentUser_ButDoesntExist() throws CurrentUserAuthorizationException {
+        when(authenticationFacade.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
+        assertThatExceptionOfType(CurrentUserAuthorizationException.class)
                 .isThrownBy(() -> userService.deleteCurrentUser())
-                .withMessage(ExceptionMessage.CURRENT_USER_NOT_FOUND);
+                .withMessage(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
     }
 
     @Test
-    public void deleteCurrentUser_WellDeleted() throws UserNotFoundException {
+    void deleteCurrentUser_WellDeleted() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         userService.deleteCurrentUser();
         verify(userRepository).delete(currentUser);
     }
 
     @Test
-    public void getTravelsOfUserThatDoesntExist() throws UserNotFoundException {
-        when(authenticationFacade.getCurrentUser()).thenThrow(new UserNotFoundException(ExceptionMessage.CURRENT_USER_NOT_FOUND));
-        assertThatExceptionOfType(UserNotFoundException.class)
+    void getTravelsOfUserThatDoesntExist() throws CurrentUserAuthorizationException {
+        when(authenticationFacade.getCurrentUser()).thenThrow(new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED));
+        assertThatExceptionOfType(CurrentUserAuthorizationException.class)
                 .isThrownBy(() -> userService.getTravels())
-                .withMessage(ExceptionMessage.CURRENT_USER_NOT_FOUND);
+                .withMessage(ExceptionMessage.CURRENT_USER_CANNOT_BE_AUTHENTICATED);
     }
 
     @Test
-    public void getTravelsOfCurrentUser() throws UserNotFoundException {
+    void getTravelsOfCurrentUser() throws UserNotFoundException, CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         when(memberService.getAllTravelsByUser(currentUser)).thenReturn(listMember);
         when(userService.convertTravelEntityToDto(oneMember.getTravel())).thenReturn(oneTravelDto);

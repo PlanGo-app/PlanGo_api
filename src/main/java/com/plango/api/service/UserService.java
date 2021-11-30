@@ -1,5 +1,6 @@
 package com.plango.api.service;
 
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.component.IAuthenticationFacade;
@@ -38,7 +39,7 @@ public class UserService {
     @Autowired
     MemberService memberService;
 
-    public UserDto getCurrentUser() throws UserNotFoundException {
+    public UserDto getCurrentUser() throws CurrentUserAuthorizationException {
         return convertUserEntityToDto(authenticationFacade.getCurrentUser());
     }
 
@@ -67,7 +68,7 @@ public class UserService {
         }
     }
 
-    public void updateUser(UserUpdateDto userUpdateDto) throws UserNotFoundException {
+    public void updateUser(UserUpdateDto userUpdateDto) throws CurrentUserAuthorizationException {
         User userOnUpdate = authenticationFacade.getCurrentUser();
         if(userUpdateDto.getEmail() != null) {
             userOnUpdate.setEmail(userUpdateDto.getEmail());
@@ -78,12 +79,12 @@ public class UserService {
         userRepository.save(userOnUpdate);
     }
 
-    public void deleteCurrentUser() throws UserNotFoundException {
+    public void deleteCurrentUser() throws CurrentUserAuthorizationException {
         User user = authenticationFacade.getCurrentUser();
         userRepository.delete(user);
     }
 
-    public List<GetTravelDto> getTravels() throws UserNotFoundException {
+    public List<GetTravelDto> getTravels() throws CurrentUserAuthorizationException {
         User user = authenticationFacade.getCurrentUser();
         List<Member> listParticipations = memberService.getAllTravelsByUser(user);
         List<GetTravelDto> listTravels = new ArrayList<>();

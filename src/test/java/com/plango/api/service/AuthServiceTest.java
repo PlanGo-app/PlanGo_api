@@ -1,6 +1,7 @@
 package com.plango.api.service;
 
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.dto.authentication.AuthDto;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class AuthServiceTest{
+class AuthServiceTest{
 
     @InjectMocks
     AuthService authService;
@@ -71,7 +72,7 @@ public class AuthServiceTest{
     }
 
     @Test
-    public void userCannotBeAuthenticated() {
+    void userCannotBeAuthenticated() {
         when(authenticationManager.authenticate(userAuthToken)).thenThrow(new BadCredentialsException(anyString()));
 
         assertThatExceptionOfType(BadCredentialsException.class)
@@ -79,7 +80,7 @@ public class AuthServiceTest{
     }
 
     @Test
-    public void shouldReturnValidLoginInformations() throws UserNotFoundException {
+    void shouldReturnValidLoginInformations() throws CurrentUserAuthorizationException {
         when(authenticationManager.authenticate(userAuthToken)).thenReturn(auth);
         when(jwtGenerator.generateToken(auth)).thenReturn(TOKEN);
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
@@ -94,7 +95,7 @@ public class AuthServiceTest{
     }
 
     @Test
-    public void tryToCreateUserThatAlreadyExists() throws UserAlreadyExistsException {
+    void tryToCreateUserThatAlreadyExists() throws UserAlreadyExistsException {
         doThrow(new UserAlreadyExistsException("")).when(userService).createUser(newUser);
         assertFalse(authService.createNewUser(newUser));
     }

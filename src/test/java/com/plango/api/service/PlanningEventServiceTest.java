@@ -72,7 +72,7 @@ class PlanningEventServiceTest {
     Pin pin;
 
     @BeforeEach
-    void setUp() throws UserNotFoundException {
+    void setUp() throws CurrentUserAuthorizationException {
         MockitoAnnotations.openMocks(this);
         currentUser = new User();
         currentUser.setId(CURRENT_USER_ID);
@@ -119,7 +119,7 @@ class PlanningEventServiceTest {
     }
 
     @Test
-    void shouldSaveNewEntity_onCreatePlanningEvent() throws UserNotFoundException, TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
+    void shouldSaveNewEntity_onCreatePlanningEvent() throws TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
         //ARRANGE
         CreatePlanningEventDto createPlanningEventDto = buildCreatePlanningEventDto();
         when(travelService.getTravelById(anyLong())).thenReturn(travel);

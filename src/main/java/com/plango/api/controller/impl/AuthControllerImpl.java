@@ -1,6 +1,6 @@
 package com.plango.api.controller.impl;
 
-import com.plango.api.common.exception.UserNotFoundException;
+import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.controller.AuthController;
 import com.plango.api.dto.authentication.AuthDto;
 import com.plango.api.dto.authentication.CredentialDto;
@@ -30,8 +30,8 @@ public class AuthControllerImpl implements AuthController {
             AuthDto authDto = authService.getLogin(credentials);
             return new ResponseEntity<>(authDto, HttpStatus.OK);
     	}
-    	catch (AuthenticationException | UserNotFoundException e) {
-    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	catch (AuthenticationException | CurrentUserAuthorizationException e) {
+    		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     	}
         
     }
@@ -46,8 +46,8 @@ public class AuthControllerImpl implements AuthController {
         // register password while it's not encoding yet to login
         String decodePwd = userDto.getPassword();
         // create user in the application
-        if(authService.createNewUser(userDto) == false) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if(!authService.createNewUser(userDto)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         // connect user to the applications
