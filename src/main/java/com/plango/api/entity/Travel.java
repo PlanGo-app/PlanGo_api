@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 public class Travel extends BaseEntity {
     @NotBlank
-    private String name;
     private String country;
     private String city;
 

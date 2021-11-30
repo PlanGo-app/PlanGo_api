@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CreateTravelDto {
-    private String name;
     private String country;
     private String city;
     private LocalDateTime dateStart;
