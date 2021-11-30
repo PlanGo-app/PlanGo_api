@@ -132,7 +132,7 @@ class PlanningEventServiceTest {
         //ASSERT
         verify(planningEventRepository).save(planningEventCaptor.capture());
         PlanningEvent planningEventSaved = planningEventCaptor.getValue();
-        assertThat(planningEventSaved). usingRecursiveComparison().isEqualTo(buildExpectedCreatedPlanningEvent());
+        assertThat(planningEventSaved).usingRecursiveComparison().isEqualTo(buildExpectedCreatedPlanningEvent());
     }
 
     @Test
