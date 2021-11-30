@@ -64,7 +64,7 @@ public class UserService {
             throw new UserAlreadyExistsException(ExceptionMessage.PSEUDO_EMAIL_TAKEN);
         } else {
             userDto.setEmail(userDto.getEmail().toLowerCase());
-            userRepository.save(convertUserDtoToEntity(userDto));
+            userRepository.save(convertUserDtoToEntityWithPasswordEncoding(userDto));
         }
     }
 
@@ -103,6 +103,10 @@ public class UserService {
     }
 
     public User convertUserDtoToEntity(UserBaseDto userDto) {
+        return modelMapper.map(userDto, User.class);
+    }
+
+    public User convertUserDtoToEntityWithPasswordEncoding(UserBaseDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         if (user.getPassword() != null) {
             user.setPassword(encoder.encode(userDto.getPassword()));
