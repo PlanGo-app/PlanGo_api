@@ -15,7 +15,7 @@ import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
-import com.plango.api.dto.travel.TravelDto;
+import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.user.UserDto;
 import com.plango.api.dto.user.UserUpdateDto;
 import com.plango.api.entity.Member;
@@ -56,8 +56,8 @@ public class UserServiceTest {
     private UserDto currentUserDto;
     private UserUpdateDto userUpdateDto_WithModif;
     private UserUpdateDto userUpdateDto_WithoutModif;
-    private TravelDto oneTravelDto;
-    private List<TravelDto> listTravelDto;
+    private GetTravelDto oneTravelDto;
+    private List<GetTravelDto> listTravelDto;
     private Member oneMember;
     private List<Member> listMember;
 
@@ -230,11 +230,11 @@ public class UserServiceTest {
         when(memberService.getAllTravelsByUser(currentUser)).thenReturn(listMember);
         when(userService.convertTravelEntityToDto(oneMember.getTravel())).thenReturn(oneTravelDto);
 
-        List<TravelDto> listTravels = userService.getTravels();
+        List<GetTravelDto> listTravels = userService.getTravels();
 
         verify(authenticationFacade).getCurrentUser();
         verify(memberService).getAllTravelsByUser(currentUser);
-        verify(modelMapper).map(oneMember.getTravel(), TravelDto.class);
+        verify(modelMapper).map(oneMember.getTravel(), GetTravelDto.class);
         assertEquals(listTravelDto, listTravels);
     }
 
@@ -255,8 +255,8 @@ public class UserServiceTest {
         return userDto;
     }
 
-    private TravelDto buildTravelDto() {
-        TravelDto travel = new TravelDto();
+    private GetTravelDto buildTravelDto() {
+        GetTravelDto travel = new GetTravelDto();
         travel.setId(USER_TRAVEL_ID);
         return travel;
     }

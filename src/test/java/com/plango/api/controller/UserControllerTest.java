@@ -4,7 +4,7 @@ import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.impl.UserControllerImpl;
-import com.plango.api.dto.travel.TravelDto;
+import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.user.UserDto;
 import com.plango.api.dto.travel.UserTravelsDto;
 import com.plango.api.dto.user.UserUpdateDto;
@@ -34,8 +34,8 @@ public class UserControllerTest {
 
     private UserDto currentUserDto;
     private UserUpdateDto updateDto;
-    private TravelDto oneTravel;
-    private List<TravelDto> listTravels;
+    private GetTravelDto oneTravel;
+    private List<GetTravelDto> listTravels;
 
     private static final String CURRENT_USER_PSEUDO = "currentUser";
     private static final Long TRAVEL_DTO_ID = 10L;
@@ -48,7 +48,7 @@ public class UserControllerTest {
         currentUserDto.setPseudo(CURRENT_USER_PSEUDO);
         updateDto = new UserUpdateDto();
         updateDto.setEmail(UPDATE_USER_EMAIL);
-        oneTravel = new TravelDto();
+        oneTravel = new GetTravelDto();
         oneTravel.setId(TRAVEL_DTO_ID);
         listTravels = new ArrayList();
         listTravels.add(oneTravel);
