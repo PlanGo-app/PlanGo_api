@@ -2,7 +2,8 @@ package com.plango.api.controller;
 
 import com.plango.api.dto.travel.CreateTravelDto;
 import com.plango.api.dto.travel.GetTravelDto;
-import com.plango.api.dto.TravelPlanningEventDto;
+import com.plango.api.dto.travel.TravelPinsDto;
+import com.plango.api.dto.travel.TravelPlanningEventsDto;
 import com.plango.api.dto.member.TravelMembersDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +30,10 @@ public interface TravelController {
     ResponseEntity<GetTravelDto> getTravelWithInvitation(@RequestParam String code);
 
     @GetMapping("{travelId}/planningEvents")
-    ResponseEntity<TravelPlanningEventDto> getTravelPlanningEvents(@PathVariable Long travelId);
+    ResponseEntity<TravelPlanningEventsDto> getTravelPlanningEvents(@PathVariable Long travelId);
+
+    @GetMapping("{travelId}/planningEvents")
+    ResponseEntity<TravelPinsDto> getTravelPins(@PathVariable Long travelId);
+
+
 }

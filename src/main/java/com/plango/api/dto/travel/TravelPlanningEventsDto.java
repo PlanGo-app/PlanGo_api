@@ -1,4 +1,4 @@
-package com.plango.api.dto;
+package com.plango.api.dto.travel;
 
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor
-public class TravelPlanningEventDto {
+public class TravelPlanningEventsDto {
     List<GetPlanningEventDto> planningEvents;
 }

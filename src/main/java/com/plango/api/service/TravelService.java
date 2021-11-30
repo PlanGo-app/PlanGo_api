@@ -7,10 +7,12 @@ import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.dto.member.MemberDto;
+import com.plango.api.dto.pin.GetPinDto;
 import com.plango.api.dto.travel.CreateTravelDto;
 import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.member.TravelMembersDto;
-import com.plango.api.dto.TravelPlanningEventDto;
+import com.plango.api.dto.travel.TravelPinsDto;
+import com.plango.api.dto.travel.TravelPlanningEventsDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
@@ -37,6 +39,9 @@ public class TravelService {
     PlanningEventService planningEventService;
 
     @Autowired
+    PinService pinService;
+
+    @Autowired
     IAuthenticationFacade authenticationFacade;
 
     @Autowired
@@ -46,11 +51,7 @@ public class TravelService {
     ModelMapper modelMapper;
 
     public Travel getTravelById(Long id) throws TravelNotFoundException {
-        Travel travel = travelRepository.findById(id).orElse(null);
-        if(travel == null){
-            throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
-        }
-        return travel;
+        return findTravelById(id);
     }
 
     public void createTravel(Travel newTravel) throws UserNotFoundException, CurrentUserAuthorizationException {
@@ -85,10 +86,7 @@ public class TravelService {
     }
 
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {
-        Travel travel = travelRepository.findById(id).orElse(null);
-        if(travel == null){
-            throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
-        }
+        Travel travel = findTravelById(id);
         List<Member> listParticipants = memberService.getAllMembersByTravel(travel);
         List<MemberDto> membersDto = new ArrayList<>();
         for(Member participant : listParticipants) {
@@ -105,13 +103,24 @@ public class TravelService {
         return convertToGetDto(travel);
     }
 
-    public TravelPlanningEventDto getTravelPlanningEvents(Long travelId) throws TravelNotFoundException {
-        Travel travel = travelRepository.findById(travelId).orElse(null);
-        if(travel == null){
-            throw new TravelNotFoundException(String.format("No travel with id: %s were found", travelId));
-        }
+    public TravelPlanningEventsDto getTravelPlanningEvents(Long travelId) throws TravelNotFoundException {
+        Travel travel = findTravelById(travelId);
         List<GetPlanningEventDto> planningEventDtoList = planningEventService.getPlanningEventByTravel(travel);
-        return new TravelPlanningEventDto(planningEventDtoList);
+        return new TravelPlanningEventsDto(planningEventDtoList);
+    }
+
+    public TravelPinsDto getTravelPins(Long travelId) throws TravelNotFoundException {
+        Travel travel = findTravelById(travelId);
+        List<GetPinDto> pinDtoList = pinService.getPinByTravel(travel);
+        return new TravelPinsDto(pinDtoList);
+    }
+
+    private Travel findTravelById(Long id) throws TravelNotFoundException {
+        Travel travel = travelRepository.findById(id).orElse(null);
+        if(travel == null){
+            throw new TravelNotFoundException(String.format("No travel with id: %s were found", id));
+        }
+        return travel;
     }
 
     private void checkOrganizerRoleCurrentUser(Travel travel) throws CurrentUserAuthorizationException {

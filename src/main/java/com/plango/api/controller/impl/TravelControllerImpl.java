@@ -10,7 +10,8 @@ import com.plango.api.controller.TravelController;
 import com.plango.api.dto.travel.CreateTravelDto;
 import com.plango.api.dto.travel.GetTravelDto;
 import com.plango.api.dto.member.TravelMembersDto;
-import com.plango.api.dto.TravelPlanningEventDto;
+import com.plango.api.dto.travel.TravelPinsDto;
+import com.plango.api.dto.travel.TravelPlanningEventsDto;
 import com.plango.api.entity.Travel;
 
 import com.plango.api.entity.User;
@@ -132,12 +133,22 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<TravelPlanningEventDto> getTravelPlanningEvents(Long travelId) {
+    public ResponseEntity<TravelPlanningEventsDto> getTravelPlanningEvents(Long travelId) {
         try {
-            TravelPlanningEventDto travelPlanningEventDto = travelService.getTravelPlanningEvents(travelId);
-            return ResponseEntity.ok(travelPlanningEventDto);
+            TravelPlanningEventsDto travelPlanningEventsDto = travelService.getTravelPlanningEvents(travelId);
+            return ResponseEntity.ok(travelPlanningEventsDto);
         } catch (TravelNotFoundException e) {
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public ResponseEntity<TravelPinsDto> getTravelPins(Long travelId) {
+        try {
+            TravelPinsDto travelPinsDto = travelService.getTravelPins(travelId);
+            return ResponseEntity.ok(travelPinsDto);
+        } catch (TravelNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
