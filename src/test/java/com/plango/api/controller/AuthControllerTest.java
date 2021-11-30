@@ -41,7 +41,7 @@ public class AuthControllerTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         credentials = new CredentialDto();
-        credentials.setUsername(CREDENTIALS);
+        credentials.setPseudo(CREDENTIALS);
         credentials.setPassword(CREDENTIALS);
         newUser = new UserDto();
         newUser.setEmail(EMAIL);

@@ -57,13 +57,13 @@ public class AuthServiceTest{
     void init() {
         MockitoAnnotations.openMocks(this);
         credentials = new CredentialDto();
-        credentials.setUsername(CREDENTIALS);
+        credentials.setPseudo(CREDENTIALS);
         credentials.setPassword(CREDENTIALS);
         newUser = new UserDto();
         newUser.setEmail(EMAIL);
         newUser.setPseudo(CREDENTIALS);
         newUser.setPassword(CREDENTIALS);
-        userAuthToken = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
+        userAuthToken = new UsernamePasswordAuthenticationToken(credentials.getPseudo(), credentials.getPassword());
         auth = new TestingAuthenticationToken(credentials, credentials.getPassword());
         currentUser = new User();
         currentUser.setId(CURRENT_USER_ID);
