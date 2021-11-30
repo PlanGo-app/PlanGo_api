@@ -7,15 +7,15 @@ import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
-import com.plango.api.dto.TravelDto;
-import com.plango.api.dto.TravelMembersDto;
+import com.plango.api.dto.travel.CreateTravelDto;
+import com.plango.api.dto.travel.GetTravelDto;
+import com.plango.api.dto.member.TravelMembersDto;
 import com.plango.api.dto.TravelPlanningEventDto;
 import com.plango.api.entity.Travel;
 
 import com.plango.api.entity.User;
 import com.plango.api.service.TravelService;
 import com.plango.api.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +36,9 @@ public class TravelControllerImpl implements TravelController {
      * @return : CREATED, or else : exception message, or : user authenticated not found
      */
     @Override
-    public ResponseEntity<String> createTravel(TravelDto newTravelInfo) {
+    public ResponseEntity<String> createTravel(CreateTravelDto newTravelInfo) {
         try {
-            travelService.createTravel(travelService.convertToEntity(newTravelInfo));
+            travelService.createTravel(travelService.convertCreateDtoToEntity(newTravelInfo));
             return new ResponseEntity<>(
                     "New travel created.",
                     HttpStatus.CREATED);
@@ -121,9 +121,9 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
-    public ResponseEntity<TravelDto> getTravelWithInvitation(String code) {
+    public ResponseEntity<GetTravelDto> getTravelWithInvitation(String code) {
         try {
-            TravelDto travelFound = travelService.getTravelByInvitationCode(code);
+            GetTravelDto travelFound = travelService.getTravelByInvitationCode(code);
             return new ResponseEntity<>(travelFound, HttpStatus.OK);
         }
         catch(TravelNotFoundException e){

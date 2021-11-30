@@ -2,9 +2,9 @@ package com.plango.api.controller.impl;
 
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.AuthController;
-import com.plango.api.dto.AuthDto;
-import com.plango.api.dto.CredentialDto;
-import com.plango.api.dto.UserDto;
+import com.plango.api.dto.authentication.AuthDto;
+import com.plango.api.dto.authentication.CredentialDto;
+import com.plango.api.dto.user.UserDto;
 import com.plango.api.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,10 +3,10 @@ package com.plango.api.service;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.component.IAuthenticationFacade;
-import com.plango.api.dto.TravelDto;
-import com.plango.api.dto.UserBaseDto;
-import com.plango.api.dto.UserDto;
-import com.plango.api.dto.UserUpdateDto;
+import com.plango.api.dto.travel.GetTravelDto;
+import com.plango.api.dto.user.UserBaseDto;
+import com.plango.api.dto.user.UserDto;
+import com.plango.api.dto.user.UserUpdateDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -84,18 +84,18 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<TravelDto> getTravels() throws UserNotFoundException {
+    public List<GetTravelDto> getTravels() throws UserNotFoundException {
         User user = authenticationFacade.getCurrentUser();
         List<Member> listParticipations = memberService.getAllTravelsByUser(user);
-        List<TravelDto> listTravels = new ArrayList<>();
+        List<GetTravelDto> listTravels = new ArrayList<>();
         for(Member listParticipation : listParticipations){
             listTravels.add(convertTravelEntityToDto(listParticipation.getTravel()));
         }
         return listTravels;
     }
 
-    public TravelDto convertTravelEntityToDto(Travel travel) {
-        return modelMapper.map(travel, TravelDto.class);
+    public GetTravelDto convertTravelEntityToDto(Travel travel) {
+        return modelMapper.map(travel, GetTravelDto.class);
     }
 
     public UserDto convertUserEntityToDto(User user) {

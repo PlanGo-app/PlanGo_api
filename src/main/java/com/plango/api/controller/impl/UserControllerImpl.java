@@ -3,8 +3,11 @@ package com.plango.api.controller.impl;
 import com.plango.api.common.exception.UserAlreadyExistsException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.controller.UserController;
-import com.plango.api.dto.*;
 
+import com.plango.api.dto.travel.GetTravelDto;
+import com.plango.api.dto.travel.UserTravelsDto;
+import com.plango.api.dto.user.UserDto;
+import com.plango.api.dto.user.UserUpdateDto;
 import com.plango.api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +91,7 @@ public class UserControllerImpl implements UserController {
     @Override
     public ResponseEntity<UserTravelsDto> getTravelsOfCurrentUser() {
         try {
-            List<TravelDto> travels = userService.getTravels();
+            List<GetTravelDto> travels = userService.getTravels();
             return new ResponseEntity<>(new UserTravelsDto(travels), HttpStatus.OK);
         }
         catch(UserNotFoundException e){

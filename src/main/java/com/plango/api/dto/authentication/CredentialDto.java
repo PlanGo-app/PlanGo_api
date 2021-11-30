@@ -1,4 +1,4 @@
-package com.plango.api.dto;
+package com.plango.api.dto.authentication;
 
 import lombok.Getter;
 import lombok.Setter;
