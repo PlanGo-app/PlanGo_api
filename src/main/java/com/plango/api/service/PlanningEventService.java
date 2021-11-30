@@ -83,7 +83,6 @@ public class PlanningEventService {
                 .stream()
                 .map(planningEvent -> mapper.map(planningEvent, GetPlanningEventDto.class))
                 .collect(Collectors.toList());
-
     }
 
     private PlanningEvent findPlanningEventById(Long id) throws PlanningEventNotFoundException {
