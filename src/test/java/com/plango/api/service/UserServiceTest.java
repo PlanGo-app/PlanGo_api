@@ -119,7 +119,7 @@ class UserServiceTest {
 
         assertThatExceptionOfType(UserNotFoundException.class)
                 .isThrownBy(() -> userService.getUserById(USER_THAT_DOESNT_EXIST_ID))
-                .withMessageContaining("No user with id");
+                .withMessage(ExceptionMessage.USER_NOT_FOUND);
     }
 
     @Test
@@ -136,7 +136,7 @@ class UserServiceTest {
 
         assertThatExceptionOfType(UserNotFoundException.class)
                 .isThrownBy(() -> userService.getUserByPseudo(USER_THAT_DOESNT_EXIST_PSEUDO))
-                .withMessageContaining("No user with pseudo");
+                .withMessage(ExceptionMessage.USER_NOT_FOUND);
     }
 
     @Test
