@@ -44,7 +44,7 @@ public class PlanningEventService {
     }
 
     public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
-        if(endDateIsBeforeStartDate(createPlanningEventDto)) {
+        if(startDateAndEndDateAreSet(createPlanningEventDto) && endDateIsBeforeStartDate(createPlanningEventDto)) {
             throw new InvalidRequestDataException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
         } else if (createPlanningEventDto.getPin() == null) {
             throw new InvalidRequestDataException(ExceptionMessage.PLANNING_EVENT_MUST_BE_LINKED_TO_PIN);
@@ -83,7 +83,6 @@ public class PlanningEventService {
                 .stream()
                 .map(planningEvent -> mapper.map(planningEvent, GetPlanningEventDto.class))
                 .collect(Collectors.toList());
-
     }
 
     private PlanningEvent findPlanningEventById(Long id) throws PlanningEventNotFoundException {
@@ -96,5 +95,9 @@ public class PlanningEventService {
 
     private boolean endDateIsBeforeStartDate(PlanningEventDto planningEventDto) {
         return planningEventDto.getDateEnd().isBefore(planningEventDto.getDateStart());
+    }
+
+    private boolean startDateAndEndDateAreSet(PlanningEventDto planningEventDto) {
+        return planningEventDto.getDateStart() != null && planningEventDto.getDateEnd() != null;
     }
 }

@@ -2,31 +2,39 @@ package com.plango.api.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.postgresql.geometric.PGpoint;
-
 @Setter
 @Getter
+@RestResource(exported = false)
 @Entity
 public class Pin extends BaseEntity {
     @NotBlank
     private String name;
 
     @NotNull
-    @Column(name = "localisation")
-    private PGpoint point;
+    @Column(name = "longitude")
+    private Float longitude;
 
     @NotNull
-    @ManyToOne
+    @Column(name = "latitude")
+    private Float latitude;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel")
     private Travel travel;
 
+    @OneToOne(mappedBy = "pin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "planning_event")
+    private PlanningEvent planningEvent;
+
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 }

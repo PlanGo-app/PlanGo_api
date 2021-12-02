@@ -3,6 +3,7 @@ package com.plango.api.entity;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@RestResource(exported = false)
 @Entity
 public class Travel extends BaseEntity {
     @NotBlank

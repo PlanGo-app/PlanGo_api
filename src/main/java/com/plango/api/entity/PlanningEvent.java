@@ -3,6 +3,7 @@ package com.plango.api.entity;
 import com.plango.api.common.types.TransportType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@RestResource(exported = false)
 @Entity
 @Table(name = "planning_event")
 public class PlanningEvent extends BaseEntity {
@@ -18,16 +20,16 @@ public class PlanningEvent extends BaseEntity {
     private String name;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel")
     private Travel travel;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "pin")
     private Pin pin;
 
@@ -39,7 +41,7 @@ public class PlanningEvent extends BaseEntity {
 
     private TransportType transportTypeToNext;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_after")
     private PlanningEvent eventAfter;
 
