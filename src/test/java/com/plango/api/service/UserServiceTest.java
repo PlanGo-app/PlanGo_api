@@ -214,7 +214,7 @@ class UserServiceTest {
     void deleteCurrentUser_WellDeleted() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         userService.deleteCurrentUser();
-        verify(userRepository).delete(currentUser);
+        verify(userRepository).deleteById(currentUser.getId());
     }
 
     @Test
@@ -226,7 +226,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getTravelsOfCurrentUser() throws UserNotFoundException, CurrentUserAuthorizationException {
+    void getTravelsOfCurrentUser() throws CurrentUserAuthorizationException {
         when(authenticationFacade.getCurrentUser()).thenReturn(currentUser);
         when(memberService.getAllTravelsByUser(currentUser)).thenReturn(listMember);
         when(userService.convertTravelEntityToDto(oneMember.getTravel())).thenReturn(oneTravelDto);

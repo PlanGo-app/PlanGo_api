@@ -1,11 +1,13 @@
 package com.plango.api.common.component;
 
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
+import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 import com.plango.api.service.MemberService;
+import com.plango.api.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Component;
 public class UserRight {
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    TravelService travelService;
 
     @Autowired
     IAuthenticationFacade authenticationFacade;
@@ -28,6 +33,17 @@ public class UserRight {
             Role currentUserRole = memberService.getMemberByTravel(travel, user).getRole();
             return currentUserRole.equals(Role.ADMIN) || currentUserRole.equals(Role.ORGANIZER);
         } catch (UserNotFoundException e) {
+            throw new CurrentUserAuthorizationException(e.getMessage());
+        }
+    }
+
+    public boolean currentUserCanWrite(Long travelId) throws CurrentUserAuthorizationException {
+        try {
+           Travel travel = travelService.getTravelById(travelId);
+            User user = authenticationFacade.getCurrentUser();
+            Role currentUserRole = memberService.getMemberByTravel(travel, user).getRole();
+            return currentUserRole.equals(Role.ADMIN) || currentUserRole.equals(Role.ORGANIZER);
+        } catch (UserNotFoundException | TravelNotFoundException e) {
             throw new CurrentUserAuthorizationException(e.getMessage());
         }
     }

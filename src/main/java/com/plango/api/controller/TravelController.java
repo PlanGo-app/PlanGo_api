@@ -32,7 +32,7 @@ public interface TravelController {
     @GetMapping("{travelId}/planningEvents")
     ResponseEntity<TravelPlanningEventsDto> getTravelPlanningEvents(@PathVariable Long travelId);
 
-    @GetMapping("{travelId}/planningEvents")
+    @GetMapping("{travelId}/pins")
     ResponseEntity<TravelPinsDto> getTravelPins(@PathVariable Long travelId);
 
 

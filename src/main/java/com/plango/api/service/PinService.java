@@ -7,7 +7,6 @@ import com.plango.api.common.exception.*;
 import com.plango.api.dto.pin.CreatePinDto;
 import com.plango.api.dto.pin.GetPinDto;
 import com.plango.api.dto.pin.UpdatePinDto;
-import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.entity.Pin;
 import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.Travel;
@@ -33,6 +32,9 @@ public class PinService {
     PlanningEventService planningEventService;
 
     @Autowired
+    TravelService travelService;
+
+    @Autowired
     UserRight userRight;
 
     @Autowired
@@ -43,49 +45,43 @@ public class PinService {
         if(!userRight.currentUserCanRead(pin.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PIN);
         }
-        return mapper.map(pin, GetPinDto.class);
+        return mapPinToCreatePinDto(pin);
     }
 
-    public void createPin(CreatePinDto createPinDto) throws PinAlreadyExistException, UserNotFoundException, TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
-        Pin pinToCheckIfExist = pinRepository.findByTravelAndLongitudeAndLatitude(createPinDto.getTravel(), createPinDto.getLongitude(), createPinDto.getLatitude()).orElse(null);
+    public void createPin(CreatePinDto createPinDto) throws PinAlreadyExistException, TravelNotFoundException, CurrentUserAuthorizationException {
+        Pin pinToCheckIfExist = pinRepository.findByTravelIdAndLongitudeAndLatitude(createPinDto.getTravelId(), createPinDto.getLongitude(), createPinDto.getLatitude()).orElse(null);
         if(pinToCheckIfExist != null) {
             throw new PinAlreadyExistException(ExceptionMessage.PIN_ALREADY_EXIST);
         }
-        if(!userRight.currentUserCanWrite(createPinDto.getTravel())) {
+        if(!userRight.currentUserCanWrite(createPinDto.getTravelId())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_CREATE_PIN);
         }
         Pin pin = mapper.map(createPinDto, Pin.class);
         pin.setCreatedBy(authenticationFacade.getCurrentUser());
-
+        Travel travel = travelService.getTravelById(createPinDto.getTravelId());
         PlanningEvent planningEvent = new PlanningEvent();
         planningEvent.setPin(pin);
+        planningEvent.setTravel(travel);
         planningEvent.setCreatedBy(authenticationFacade.getCurrentUser());
         planningEvent.setName(pin.getName());
 
         pin.setPlanningEvent(planningEvent);
-        planningEventService.createPlanningEvent(mapper.map(planningEvent, CreatePlanningEventDto.class));
         pinRepository.save(pin);
     }
 
-    public void updatePin(UpdatePinDto updatePinDto) throws PinNotFoundException {
+    public void updatePin(UpdatePinDto updatePinDto) throws PinNotFoundException, CurrentUserAuthorizationException {
         Pin pinToUpdate = findPinById(updatePinDto.getId());
-        pinToUpdate.setName(updatePinDto.getName());
         if(!pinToUpdate.getName().equals(updatePinDto.getName())) {
+            if(!userRight.currentUserCanWrite(pinToUpdate.getTravel())) {
+                throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN);
+            }
+            pinToUpdate.setName(updatePinDto.getName());
             pinRepository.save(pinToUpdate);
         }
     }
 
     public void deletePinById(Long id) throws PinNotFoundException {
-        Pin pinToDel = findPinById(id);
-        Long planningEventId = pinToDel.getPlanningEvent().getId();
-        try {
-            planningEventService.getPlanningEventById(planningEventId);
-            planningEventService.deletePlanningEventById(planningEventId);
-        } catch (PlanningEventNotFoundException e) {
-            log.error("Linked planning event not found to delete.");
-        } catch (CurrentUserAuthorizationException e) {
-            log.error("Authorisation issue trying to find linked planning event for deletion");
-        }
+        findPinById(id);
         pinRepository.deleteById(id);
     }
 
@@ -103,5 +99,17 @@ public class PinService {
             throw new PinNotFoundException(ExceptionMessage.PIN_NOT_FOUND);
         }
         return pin;
+    }
+
+    private GetPinDto mapPinToCreatePinDto(Pin pin) {
+        GetPinDto getPinDto = new GetPinDto();
+        getPinDto.setId(pin.getId());
+        getPinDto.setName(pin.getName());
+        getPinDto.setLongitude(pin.getLongitude());
+        getPinDto.setLatitude(pin.getLatitude());
+        getPinDto.setCreatedBy(pin.getCreatedBy().getId());
+        getPinDto.setTravelId(pin.getTravel().getId());
+        getPinDto.setPlanningEventId(pin.getPlanningEvent().getId());
+        return getPinDto;
     }
 }

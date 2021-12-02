@@ -2,6 +2,7 @@ package com.plango.api.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Setter
 @Getter
+@RestResource(exported = false)
 @Entity
 public class Pin extends BaseEntity {
     @NotBlank
@@ -23,16 +25,16 @@ public class Pin extends BaseEntity {
     private Float latitude;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel")
     private Travel travel;
 
-    @OneToOne
+    @OneToOne(mappedBy = "pin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "planning_event")
     private PlanningEvent planningEvent;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 }

@@ -9,7 +9,9 @@ import com.plango.api.service.PinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 public class PinControllerImpl implements PinController {
     @Autowired
     PinService pinService;
@@ -33,9 +35,9 @@ public class PinControllerImpl implements PinController {
             return ResponseEntity.ok("Pin created");
         } catch (PinAlreadyExistException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        } catch (InvalidRequestDataException | TravelNotFoundException e) {
+        } catch (TravelNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (CurrentUserAuthorizationException | UserNotFoundException e) {
+        } catch (CurrentUserAuthorizationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
@@ -47,6 +49,8 @@ public class PinControllerImpl implements PinController {
             return ResponseEntity.ok("Pin updated");
         } catch (PinNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
 
     }

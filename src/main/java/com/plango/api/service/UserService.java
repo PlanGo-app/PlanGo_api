@@ -85,7 +85,7 @@ public class UserService {
 
     public void deleteCurrentUser() throws CurrentUserAuthorizationException {
         User user = authenticationFacade.getCurrentUser();
-        userRepository.delete(user);
+        userRepository.deleteById(user.getId());
     }
 
     public List<GetTravelDto> getTravels() throws CurrentUserAuthorizationException {
