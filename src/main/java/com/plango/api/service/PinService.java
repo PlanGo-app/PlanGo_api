@@ -72,7 +72,7 @@ public class PinService {
     public void updatePin(UpdatePinDto updatePinDto) throws PinNotFoundException, CurrentUserAuthorizationException {
         Pin pinToUpdate = findPinById(updatePinDto.getId());
         if(!pinToUpdate.getName().equals(updatePinDto.getName())) {
-            if(!userRight.currentUserCanWrite(pinToUpdate.getTravel()) || pinToUpdate.getCreatedBy() != authenticationFacade.getCurrentUser()) {
+            if(!userRight.currentUserCanWrite(pinToUpdate.getTravel())) {
                 throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN);
             }
             pinToUpdate.setName(updatePinDto.getName());
@@ -84,7 +84,7 @@ public class PinService {
 
     public void deletePinById(Long id) throws PinNotFoundException, CurrentUserAuthorizationException {
         Pin pinToDelete = findPinById(id);
-        if(!userRight.currentUserCanWrite(pinToDelete.getTravel()) || pinToDelete.getCreatedBy() != authenticationFacade.getCurrentUser()) {
+        if(!userRight.currentUserCanWrite(pinToDelete.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_DELETE_PIN);
         }
         pinRepository.deleteById(id);
