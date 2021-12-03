@@ -76,6 +76,8 @@ public class PinService {
                 throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN);
             }
             pinToUpdate.setName(updatePinDto.getName());
+            PlanningEvent pinPlanningEvent = pinToUpdate.getPlanningEvent();
+            pinPlanningEvent.setName(pinToUpdate.getName());
             pinRepository.save(pinToUpdate);
         }
     }
