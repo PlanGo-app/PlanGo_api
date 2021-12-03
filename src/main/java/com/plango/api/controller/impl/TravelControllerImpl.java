@@ -127,12 +127,14 @@ public class TravelControllerImpl implements TravelController {
     public ResponseEntity<GetTravelDto> addMemberToTravelWithInvitation(String code) {
         try {
             GetTravelDto travelFound = travelService.getTravelByInvitationCode(code);
-            travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.getCurrentUser(), Role.OBSERVER);
+            travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.getCurrentUser(), Role.ORGANIZER);
             return new ResponseEntity<>(travelFound, HttpStatus.OK);
-        }
-        catch(TravelNotFoundException | UserNotFoundException | CurrentUserAuthorizationException e){
+        } catch(TravelNotFoundException | UserNotFoundException e){
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch(CurrentUserAuthorizationException e){
+            log.error(e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -141,6 +143,8 @@ public class TravelControllerImpl implements TravelController {
         try {
             TravelPlanningEventsDto travelPlanningEventsDto = travelService.getTravelPlanningEvents(travelId);
             return ResponseEntity.ok(travelPlanningEventsDto);
+        } catch (CurrentUserAuthorizationException e) {
+           return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (TravelNotFoundException e) {
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -151,6 +155,8 @@ public class TravelControllerImpl implements TravelController {
         try {
             TravelPinsDto travelPinsDto = travelService.getTravelPins(travelId);
             return ResponseEntity.ok(travelPinsDto);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (TravelNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

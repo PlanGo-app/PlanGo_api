@@ -47,7 +47,7 @@ public class UserControllerImpl implements UserController {
         try {
             userService.createUser(userDto);
         } catch(UserAlreadyExistsException e){
-            return new ResponseEntity<>(ExceptionMessage.PSEUDO_EMAIL_TAKEN, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ExceptionMessage.PSEUDO_EMAIL_TAKEN, HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(String.format("User %s created", userDto.getPseudo()), HttpStatus.CREATED);
     }
