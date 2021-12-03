@@ -36,7 +36,7 @@ public class PinControllerImpl implements PinController {
         } catch (PinAlreadyExistException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } catch (TravelNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (CurrentUserAuthorizationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }

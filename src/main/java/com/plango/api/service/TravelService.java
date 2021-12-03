@@ -2,6 +2,8 @@ package com.plango.api.service;
 
 import com.plango.api.common.component.CodeGenerator;
 import com.plango.api.common.component.IAuthenticationFacade;
+import com.plango.api.common.component.UserRight;
+import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
 import com.plango.api.common.exception.UserNotFoundException;
@@ -48,13 +50,16 @@ public class TravelService {
     CodeGenerator codeGenerator;
 
     @Autowired
+    UserRight userRight;
+
+    @Autowired
     ModelMapper modelMapper;
 
     public Travel getTravelById(Long id) throws TravelNotFoundException {
         return findTravelById(id);
     }
 
-    public void createTravel(Travel newTravel) throws UserNotFoundException, CurrentUserAuthorizationException {
+    public void createTravel(Travel newTravel) throws CurrentUserAuthorizationException {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         newTravel.setInvitationCode(this.generateUniqueInvitationCode());
@@ -62,7 +67,7 @@ public class TravelService {
         this.addMember(travel, currentUser, Role.ADMIN);
     }
 
-    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserNotFoundException {
+    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException {
         if(authenticationFacade.getCurrentUser() != user){
             this.checkOrganizerRoleCurrentUser(travel);
         }
@@ -103,13 +108,19 @@ public class TravelService {
         return convertToGetDto(travel);
     }
 
-    public TravelPlanningEventsDto getTravelPlanningEvents(Long travelId) throws TravelNotFoundException {
+    public TravelPlanningEventsDto getTravelPlanningEvents(Long travelId) throws TravelNotFoundException, CurrentUserAuthorizationException {
+        if(!userRight.currentUserCanRead(travelId)) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PLANNING_EVENT);
+        }
         Travel travel = findTravelById(travelId);
         List<GetPlanningEventDto> planningEventDtoList = planningEventService.getPlanningEventByTravel(travel);
         return new TravelPlanningEventsDto(planningEventDtoList);
     }
 
-    public TravelPinsDto getTravelPins(Long travelId) throws TravelNotFoundException {
+    public TravelPinsDto getTravelPins(Long travelId) throws TravelNotFoundException, CurrentUserAuthorizationException {
+        if(!userRight.currentUserCanRead(travelId)) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PIN);
+        }
         Travel travel = findTravelById(travelId);
         List<GetPinDto> pinDtoList = pinService.getPinByTravel(travel);
         return new TravelPinsDto(pinDtoList);

@@ -104,7 +104,7 @@ class AuthControllerTest {
 
         verify(authService).createNewUser(newUser);
         verify(authService).getLogin(any(CredentialDto.class));
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(newAuth, response.getBody());
     }
 }

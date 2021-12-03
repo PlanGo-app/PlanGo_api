@@ -82,7 +82,7 @@ class UserControllerTest {
         ResponseEntity<String> response = userController.createUser(currentUserDto);
 
         verify(userService).createUser(currentUserDto);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
     @Test

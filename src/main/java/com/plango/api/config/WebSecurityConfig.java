@@ -1,4 +1,4 @@
-package com.plango.api;
+package com.plango.api.config;
 
 import com.plango.api.security.JwtChecker;
 
@@ -21,7 +21,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
+    private static final String[] AUTH_LIST = {
+            "/auth/**",
+            // -- swagger ui
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/swagger-ui/*",
+            "/v2/*",
+            "/webjars/**",
+            "/favicon.ico"
+    };
+
 	@Autowired
 	UserDetailsService userDetailsService;
 
@@ -50,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
             .authorizeRequests()
-            .antMatchers("/auth/**").permitAll()
+            .antMatchers(AUTH_LIST).permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

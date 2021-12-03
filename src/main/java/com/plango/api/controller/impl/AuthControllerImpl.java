@@ -55,7 +55,7 @@ public class AuthControllerImpl implements AuthController {
         connect.setPseudo(userDto.getPseudo());
         connect.setPassword(decodePwd);
         try {
-            return new ResponseEntity<>(authService.getLogin(connect), HttpStatus.OK);
+            return new ResponseEntity<>(authService.getLogin(connect), HttpStatus.CREATED);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
