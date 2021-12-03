@@ -48,7 +48,7 @@ public class TravelControllerImpl implements TravelController {
         } catch (IllegalArgumentException | MappingException e) {
             return new ResponseEntity<>("Couldn't create travel because of missing or wrong informations.", HttpStatus.BAD_REQUEST);
         }
-        catch (UserNotFoundException | CurrentUserAuthorizationException e){
+        catch (CurrentUserAuthorizationException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
 
@@ -129,7 +129,7 @@ public class TravelControllerImpl implements TravelController {
             GetTravelDto travelFound = travelService.getTravelByInvitationCode(code);
             travelService.addMember(travelService.getTravelById(travelFound.getId()), userService.getCurrentUser(), Role.ORGANIZER);
             return new ResponseEntity<>(travelFound, HttpStatus.OK);
-        } catch(TravelNotFoundException | UserNotFoundException e){
+        } catch(TravelNotFoundException e){
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch(CurrentUserAuthorizationException e){
