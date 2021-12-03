@@ -1,4 +1,4 @@
-package com.plango.api;
+package com.plango.api.config;
 
 import com.plango.api.security.JwtChecker;
 
