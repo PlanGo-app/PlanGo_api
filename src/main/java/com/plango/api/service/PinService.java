@@ -72,7 +72,7 @@ public class PinService {
     public void updatePin(UpdatePinDto updatePinDto) throws PinNotFoundException, CurrentUserAuthorizationException {
         Pin pinToUpdate = findPinById(updatePinDto.getId());
         if(!pinToUpdate.getName().equals(updatePinDto.getName())) {
-            if(!userRight.currentUserCanWrite(pinToUpdate.getTravel())) {
+            if(!userRight.currentUserCanWrite(pinToUpdate.getTravel()) || pinToUpdate.getCreatedBy() != authenticationFacade.getCurrentUser()) {
                 throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN);
             }
             pinToUpdate.setName(updatePinDto.getName());
