@@ -32,7 +32,7 @@ public class PinControllerImpl implements PinController {
     public ResponseEntity<String> createPin(CreatePinDto pin) {
         try {
             pinService.createPin(pin);
-            return ResponseEntity.ok("Pin created");
+            return new ResponseEntity<>("Pin created", HttpStatus.CREATED);
         } catch (PinAlreadyExistException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } catch (TravelNotFoundException e) {
@@ -62,6 +62,9 @@ public class PinControllerImpl implements PinController {
             return ResponseEntity.ok("Pin deleted");
         } catch (PinNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 }

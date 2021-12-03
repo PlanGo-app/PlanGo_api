@@ -76,12 +76,17 @@ public class PinService {
                 throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN);
             }
             pinToUpdate.setName(updatePinDto.getName());
+            PlanningEvent pinPlanningEvent = pinToUpdate.getPlanningEvent();
+            pinPlanningEvent.setName(pinToUpdate.getName());
             pinRepository.save(pinToUpdate);
         }
     }
 
-    public void deletePinById(Long id) throws PinNotFoundException {
-        findPinById(id);
+    public void deletePinById(Long id) throws PinNotFoundException, CurrentUserAuthorizationException {
+        Pin pinToDelete = findPinById(id);
+        if(!userRight.currentUserCanWrite(pinToDelete.getTravel())) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_DELETE_PIN);
+        }
         pinRepository.deleteById(id);
     }
 

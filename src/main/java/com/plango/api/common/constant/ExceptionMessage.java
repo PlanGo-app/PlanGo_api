@@ -11,6 +11,7 @@ public final class ExceptionMessage {
     public static final String CURRENT_USER_NOT_ALLOWED_TO_GET_PIN = "Current user not allowed to get requested pin";
     public static final String CURRENT_USER_NOT_ALLOWED_TO_CREATE_PIN = "Current user not allowed to create requested pin in this travel";
     public static final String CURRENT_USER_NOT_ALLOWED_TO_UPDATE_PIN = "Current user not allowed to update requested pin";
+    public static final String CURRENT_USER_NOT_ALLOWED_TO_DELETE_PIN = "Current user not allowed to delete requested pin";
     public static final String TRAVEL_NOT_FOUND = "Travel not found";
     public static final String PLANNING_EVENT_NOT_FOUND = "Planning event not found";
     public static final String PLANNING_EVENT_MUST_BE_LINKED_TO_PIN = "Planning event should be linked to a pin";
