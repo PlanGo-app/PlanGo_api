@@ -27,6 +27,12 @@ public class UserRight {
         return memberService.isMember(user, travel);
     }
 
+    public boolean currentUserCanRead(Long travelId) throws CurrentUserAuthorizationException, TravelNotFoundException {
+        Travel travel = travelService.getTravelById(travelId);
+        User user = authenticationFacade.getCurrentUser();
+        return memberService.isMember(user, travel);
+    }
+
     public boolean currentUserCanWrite(Travel travel) throws CurrentUserAuthorizationException {
         try {
             User user = authenticationFacade.getCurrentUser();
@@ -39,7 +45,7 @@ public class UserRight {
 
     public boolean currentUserCanWrite(Long travelId) throws CurrentUserAuthorizationException {
         try {
-           Travel travel = travelService.getTravelById(travelId);
+            Travel travel = travelService.getTravelById(travelId);
             User user = authenticationFacade.getCurrentUser();
             Role currentUserRole = memberService.getMemberByTravel(travel, user).getRole();
             return currentUserRole.equals(Role.ADMIN) || currentUserRole.equals(Role.ORGANIZER);
