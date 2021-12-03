@@ -80,8 +80,11 @@ public class PinService {
         }
     }
 
-    public void deletePinById(Long id) throws PinNotFoundException {
-        findPinById(id);
+    public void deletePinById(Long id) throws PinNotFoundException, CurrentUserAuthorizationException {
+        Pin pinToDelete = findPinById(id);
+        if(!userRight.currentUserCanWrite(pinToDelete.getTravel()) || pinToDelete.getCreatedBy() != authenticationFacade.getCurrentUser()) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_DELETE_PIN);
+        }
         pinRepository.deleteById(id);
     }
 
