@@ -25,7 +25,7 @@ public class Pin extends BaseEntity {
     private Float latitude;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
 
@@ -34,7 +34,7 @@ public class Pin extends BaseEntity {
     private PlanningEvent planningEvent;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
 }

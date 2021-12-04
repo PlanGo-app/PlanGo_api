@@ -20,16 +20,16 @@ public class PlanningEvent extends BaseEntity {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "travel")
     private Travel travel;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "pin")
     private Pin pin;
 
@@ -41,7 +41,7 @@ public class PlanningEvent extends BaseEntity {
 
     private TransportType transportTypeToNext;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "event_after")
     private PlanningEvent eventAfter;
 
