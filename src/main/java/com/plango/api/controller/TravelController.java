@@ -20,16 +20,18 @@ public interface TravelController {
      * Créer un voyage avec l'utilisateur courant comme Admin (ADMIN)
      *
      * @param newTravel : le voyage à créer
-     * @return String Confirmation de la création du voyage
+     * @return ResponseEntity<GetTravelDto> Confirmation de la création du voyage
      */
     @ApiOperation(value = "Créer un voyage avec l'utilisateur courant comme Admin")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Le voyage a bien été créé"),
+            @ApiResponse(code = 201, response = GetTravelDto.class, message = "Le voyage a bien été créé"),
             @ApiResponse(code = 400, message = "Les informations données ne permettent pas de créer un voyage"),
             @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
             @ApiResponse(code = 404, message = "L'utilisateur courant n'a pas pu être identifié")})
-    @PostMapping(path = "", consumes="application/json")
-    ResponseEntity<String> createTravel(@RequestBody CreateTravelDto newTravel);
+    @PostMapping(path = "",
+            consumes= MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<GetTravelDto> createTravel(@RequestBody CreateTravelDto newTravel);
 
     /***
      * Ajoute un utilisateur (membre) à un voyage avec un status donné
