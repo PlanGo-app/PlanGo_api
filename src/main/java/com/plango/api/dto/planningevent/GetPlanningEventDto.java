@@ -1,10 +1,6 @@
 package com.plango.api.dto.planningevent;
 
 import com.plango.api.common.types.TransportType;
-import com.plango.api.entity.Pin;
-import com.plango.api.entity.PlanningEvent;
-import com.plango.api.entity.Travel;
-import com.plango.api.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,11 +11,11 @@ import java.time.LocalDateTime;
 public class GetPlanningEventDto implements PlanningEventDto{
     private Long id;
     private String name;
-    private Travel travel;
-    private User createdBy;
-    private Pin pin;
+    private Long travelId;
+    private Long createdBy;
+    private Long pinId;
     private LocalDateTime dateStart;
     private LocalDateTime dateEnd;
     private TransportType transportTypeToNext;
-    private PlanningEvent eventAfter;
+    private Long eventAfterId;
 }

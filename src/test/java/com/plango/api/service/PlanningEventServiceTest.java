@@ -99,7 +99,7 @@ class PlanningEventServiceTest {
         GetPlanningEventDto result = planningEventService.getPlanningEventById(EVENT_ID);
 
         //ASSERT
-        assertThat(result).isEqualTo(expectedGetPlanningEventDto);
+        assertThat(result).usingRecursiveComparison().isEqualTo(expectedGetPlanningEventDto);
     }
 
     @Test
@@ -214,9 +214,9 @@ class PlanningEventServiceTest {
         GetPlanningEventDto expectedGetPlanningEventDto = new GetPlanningEventDto();
         expectedGetPlanningEventDto.setId(EVENT_ID);
         expectedGetPlanningEventDto.setName(EVENT_NAME);
-        expectedGetPlanningEventDto.setTravel(travel);
-        expectedGetPlanningEventDto.setPin(pin);
-        expectedGetPlanningEventDto.setCreatedBy(currentUser);
+        expectedGetPlanningEventDto.setTravelId(travel.getId());
+        expectedGetPlanningEventDto.setPinId(pin.getId());
+        expectedGetPlanningEventDto.setCreatedBy(currentUser.getId());
         expectedGetPlanningEventDto.setTransportTypeToNext(TransportType.PUBLIC_TRANSPORT);
         expectedGetPlanningEventDto.setDateStart(DATE_START);
         expectedGetPlanningEventDto.setDateEnd(DATE_END);

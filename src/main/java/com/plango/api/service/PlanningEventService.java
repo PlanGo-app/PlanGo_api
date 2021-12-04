@@ -4,6 +4,7 @@ import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.component.UserRight;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.*;
+import com.plango.api.common.mapper.CustMapper;
 import com.plango.api.dto.planningevent.CreatePlanningEventDto;
 import com.plango.api.dto.planningevent.GetPlanningEventDto;
 import com.plango.api.dto.planningevent.PlanningEventDto;
@@ -11,6 +12,7 @@ import com.plango.api.dto.planningevent.UpdatePlanningEventDto;
 import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.Travel;
 import com.plango.api.repository.PlanningEventRepository;
+import org.mapstruct.factory.Mappers;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,13 +37,16 @@ public class PlanningEventService {
     @Autowired
     ModelMapper mapper;
 
+    private CustMapper custMapper = Mappers.getMapper(CustMapper.class);
+
     public GetPlanningEventDto getPlanningEventById(Long id) throws PlanningEventNotFoundException, CurrentUserAuthorizationException {
         PlanningEvent planningEvent = findPlanningEventById(id);
         if(!userRight.currentUserCanRead(planningEvent.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PLANNING_EVENT);
         }
-        return mapper.map(planningEvent, GetPlanningEventDto.class);
+        return custMapper.planningEventToGetPlanningEventDto(planningEvent);
     }
+
 
     public void createPlanningEvent(CreatePlanningEventDto createPlanningEventDto) throws TravelNotFoundException, InvalidRequestDataException, CurrentUserAuthorizationException {
         if(startDateAndEndDateAreSet(createPlanningEventDto) && endDateIsBeforeStartDate(createPlanningEventDto)) {
@@ -100,4 +105,5 @@ public class PlanningEventService {
     private boolean startDateAndEndDateAreSet(PlanningEventDto planningEventDto) {
         return planningEventDto.getDateStart() != null && planningEventDto.getDateEnd() != null;
     }
+
 }
