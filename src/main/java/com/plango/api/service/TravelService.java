@@ -59,12 +59,13 @@ public class TravelService {
         return findTravelById(id);
     }
 
-    public void createTravel(Travel newTravel) throws CurrentUserAuthorizationException {
+    public GetTravelDto createTravel(Travel newTravel) throws CurrentUserAuthorizationException {
         User currentUser = authenticationFacade.getCurrentUser();
         newTravel.setCreatedBy(currentUser);
         newTravel.setInvitationCode(this.generateUniqueInvitationCode());
         Travel travel = travelRepository.save(newTravel);
         this.addMember(travel, currentUser, Role.ADMIN);
+        return convertToGetDto(travel);
     }
 
     public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException {

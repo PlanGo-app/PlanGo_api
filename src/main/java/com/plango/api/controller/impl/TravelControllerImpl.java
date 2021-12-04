@@ -39,17 +39,15 @@ public class TravelControllerImpl implements TravelController {
      * @return : CREATED, or else : exception message, or : user authenticated not found
      */
     @Override
-    public ResponseEntity<String> createTravel(CreateTravelDto newTravelInfo) {
+    public ResponseEntity<GetTravelDto> createTravel(CreateTravelDto newTravelInfo) {
         try {
-            travelService.createTravel(travelService.convertCreateDtoToEntity(newTravelInfo));
-            return new ResponseEntity<>(
-                    "New travel created.",
-                    HttpStatus.CREATED);
+            GetTravelDto getTravelDto = travelService.createTravel(travelService.convertCreateDtoToEntity(newTravelInfo));
+            return new ResponseEntity<>(getTravelDto, HttpStatus.CREATED);
         } catch (IllegalArgumentException | MappingException e) {
-            return new ResponseEntity<>("Couldn't create travel because of missing or wrong informations.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         catch (CurrentUserAuthorizationException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
