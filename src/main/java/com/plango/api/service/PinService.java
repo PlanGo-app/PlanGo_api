@@ -61,7 +61,6 @@ public class PinService {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_CREATE_PIN);
         }
         Pin pin = mapper.map(createPinDto, Pin.class);
-        pin.setId(null);
         pin.setCreatedBy(authenticationFacade.getCurrentUser());
         Travel travel = travelService.getTravelById(createPinDto.getTravelId());
         PlanningEvent planningEvent = new PlanningEvent();

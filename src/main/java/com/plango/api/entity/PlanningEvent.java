@@ -29,7 +29,7 @@ public class PlanningEvent extends BaseEntity {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToOne
+    @OneToOne(mappedBy = "planningEvent")
     @JoinColumn(name = "pin")
     private Pin pin;
 
