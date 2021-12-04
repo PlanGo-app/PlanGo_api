@@ -52,6 +52,17 @@ public class PinService {
         return custMapper.pinToGetPinDto(pin);
     }
 
+    public GetPinDto getPinByTravelAndCoordinates(Long travelId, Float longitude, Float latitude) throws PinNotFoundException, TravelNotFoundException, CurrentUserAuthorizationException {
+        if(!userRight.currentUserCanRead(travelId)) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PIN);
+        }
+        Pin pin = pinRepository.findByTravelIdAndLongitudeAndLatitude(travelId, longitude, latitude).orElse(null);
+        if(pin == null) {
+            throw new PinNotFoundException(ExceptionMessage.PIN_NOT_FOUND);
+        }
+        return custMapper.pinToGetPinDto(pin);
+    }
+
     public void createPin(CreatePinDto createPinDto) throws PinAlreadyExistException, TravelNotFoundException, CurrentUserAuthorizationException {
         Pin pinToCheckIfExist = pinRepository.findByTravelIdAndLongitudeAndLatitude(createPinDto.getTravelId(), createPinDto.getLongitude(), createPinDto.getLatitude()).orElse(null);
         if(pinToCheckIfExist != null) {

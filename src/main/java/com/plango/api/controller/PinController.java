@@ -29,6 +29,24 @@ public interface PinController {
     ResponseEntity<GetPinDto> getPinById(@PathVariable Long id);
 
     /***
+     * Recherche d'un pin par son l'id du voyage et ses coordonnées
+     *
+     * @param travelId : id du voyage dans lequel se trouve le pin
+     * @param longitude : longitude du pin
+     * @param latitude : latitude du pin
+     * @return ResponseEntity<GetPinDto> le pin de trouvant aux coordonnées indiquées du voyage
+     */
+    @ApiOperation(value = "Récupérer un pin identifié par l'id du voyage et de ses coordonnées.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, response = GetPinDto.class,
+                    message = "Le pin a bien été trouvé et renvoyé"),
+            @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
+            @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas les droits d'accès au pin"),
+            @ApiResponse(code = 404, message = "Aucun pin à ces coordonnées n'a pu être trouvé pour ce voyage")})
+    @GetMapping(path = "/travel/{travelId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<GetPinDto> getPinByCoordinates(@PathVariable Long travelId, @RequestParam Float longitude, @RequestParam Float latitude);
+
+    /***
      * Créer un pin associé à un travel et à l'utilisateur courant
      *
      * @param pin : le pin à créer

@@ -29,6 +29,18 @@ public class PinControllerImpl implements PinController {
     }
 
     @Override
+    public ResponseEntity<GetPinDto> getPinByCoordinates(Long travelId, Float longitude, Float latitude) {
+        try {
+            GetPinDto getPinDto = pinService.getPinByTravelAndCoordinates(travelId, longitude, latitude);
+            return ResponseEntity.ok(getPinDto);
+        } catch (PinNotFoundException | TravelNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @Override
     public ResponseEntity<String> createPin(CreatePinDto pin) {
         try {
             pinService.createPin(pin);
