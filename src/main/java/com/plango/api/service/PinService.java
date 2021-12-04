@@ -4,6 +4,7 @@ import com.plango.api.common.component.IAuthenticationFacade;
 import com.plango.api.common.component.UserRight;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.*;
+import com.plango.api.common.mapper.CustMapper;
 import com.plango.api.dto.pin.CreatePinDto;
 import com.plango.api.dto.pin.GetPinDto;
 import com.plango.api.dto.pin.UpdatePinDto;
@@ -12,6 +13,7 @@ import com.plango.api.entity.PlanningEvent;
 import com.plango.api.entity.Travel;
 import com.plango.api.repository.PinRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,12 +42,14 @@ public class PinService {
     @Autowired
     ModelMapper mapper;
 
+    private CustMapper custMapper = Mappers.getMapper(CustMapper.class);
+
     public GetPinDto getPinById(Long id) throws CurrentUserAuthorizationException, PinNotFoundException {
         Pin pin = findPinById(id);
         if(!userRight.currentUserCanRead(pin.getTravel())) {
             throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_GET_PIN);
         }
-        return mapPinToCreatePinDto(pin);
+        return custMapper.pinToGetPinDto(pin);
     }
 
     public void createPin(CreatePinDto createPinDto) throws PinAlreadyExistException, TravelNotFoundException, CurrentUserAuthorizationException {
@@ -94,7 +98,7 @@ public class PinService {
         List<Pin> pinList = pinRepository.findAllByTravel(travel);
         return pinList
                 .stream()
-                .map(pin -> mapper.map(pin, GetPinDto.class))
+                .map(pin -> custMapper.pinToGetPinDto(pin))
                 .collect(Collectors.toList());
     }
 
@@ -104,17 +108,5 @@ public class PinService {
             throw new PinNotFoundException(ExceptionMessage.PIN_NOT_FOUND);
         }
         return pin;
-    }
-
-    private GetPinDto mapPinToCreatePinDto(Pin pin) {
-        GetPinDto getPinDto = new GetPinDto();
-        getPinDto.setId(pin.getId());
-        getPinDto.setName(pin.getName());
-        getPinDto.setLongitude(pin.getLongitude());
-        getPinDto.setLatitude(pin.getLatitude());
-        getPinDto.setCreatedBy(pin.getCreatedBy().getId());
-        getPinDto.setTravelId(pin.getTravel().getId());
-        getPinDto.setPlanningEventId(pin.getPlanningEvent().getId());
-        return getPinDto;
     }
 }
