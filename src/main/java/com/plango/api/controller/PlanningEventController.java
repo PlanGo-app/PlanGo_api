@@ -40,6 +40,6 @@ public interface PlanningEventController {
             @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
             @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas les droits pour mettre à jour le planning event indiqué"),
             @ApiResponse(code = 404, message = "Aucun planning event avec l'id fourni n'a été trouvé")})
-    @PutMapping(path = "/{id}", consumes="application/json")
+    @PutMapping(path = "", consumes="application/json")
     ResponseEntity<String> updatePlanningEvent(@RequestBody UpdatePlanningEventDto updatePlanningEventDto);
 }
