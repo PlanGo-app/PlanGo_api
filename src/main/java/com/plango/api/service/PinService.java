@@ -42,7 +42,7 @@ public class PinService {
     @Autowired
     ModelMapper mapper;
 
-    private CustMapper custMapper = Mappers.getMapper(CustMapper.class);
+    private final CustMapper custMapper = Mappers.getMapper(CustMapper.class);
 
     public GetPinDto getPinById(Long id) throws CurrentUserAuthorizationException, PinNotFoundException {
         Pin pin = findPinById(id);
@@ -106,11 +106,22 @@ public class PinService {
         pinRepository.deleteById(id);
     }
 
+    public void deletePinByCoordinates(Long travelId, Float longitude, Float latitude) throws CurrentUserAuthorizationException, PinNotFoundException {
+        if(!userRight.currentUserCanWrite(travelId)) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_DELETE_PIN);
+        }
+        Pin pinToDelete = pinRepository.findByTravelIdAndLongitudeAndLatitude(travelId, longitude, latitude).orElse(null);
+        if(pinToDelete == null) {
+            throw new PinNotFoundException(ExceptionMessage.PIN_NOT_FOUND);
+        }
+        pinRepository.deleteById(pinToDelete.getId());
+    }
+
     public List<GetPinDto> getPinByTravel(Travel travel) {
         List<Pin> pinList = pinRepository.findAllByTravel(travel);
         return pinList
                 .stream()
-                .map(pin -> custMapper.pinToGetPinDto(pin))
+                .map(custMapper::pinToGetPinDto)
                 .collect(Collectors.toList());
     }
 

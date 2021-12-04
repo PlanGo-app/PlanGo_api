@@ -92,5 +92,23 @@ public interface PinController {
     @DeleteMapping(path = "/{id}")
     ResponseEntity<String> deletePinById(@PathVariable Long id);
 
+    /***
+     * Delete pin par l'id du voyage et ses coordonnées
+     *
+     * @param travelId : id du voyage dans lequel se trouve le pin
+     * @param longitude : longitude du pin
+     * @param latitude : latitude du pin
+     * @return String Confirmation de la suppression du pin
+     */
+    @ApiOperation(value = "Récupérer un pin identifié par l'id du voyage et de ses coordonnées.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, response = GetPinDto.class,
+                    message = "Le pin a bien été trouvé et supprimé"),
+            @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
+            @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas les droits d'accès au pin"),
+            @ApiResponse(code = 404, message = "Aucun pin à ces coordonnées n'a pu être trouvé pour ce voyage")})
+    @DeleteMapping(path = "/travel/{travelId}")
+    ResponseEntity<String> deletePinByCoordinates(@PathVariable Long travelId, @RequestParam Float longitude, @RequestParam Float latitude);
+
 
 }

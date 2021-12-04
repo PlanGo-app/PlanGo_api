@@ -79,4 +79,16 @@ public class PinControllerImpl implements PinController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
+
+    @Override
+    public ResponseEntity<String> deletePinByCoordinates(Long travelId, Float longitude, Float latitude) {
+        try {
+            pinService.deletePinByCoordinates(travelId, longitude, latitude);
+            return ResponseEntity.ok("Pin deleted");
+        } catch (PinNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
+    }
 }
