@@ -62,6 +62,7 @@ public class PinService {
         }
         Pin pin = mapper.map(createPinDto, Pin.class);
         pin.setCreatedBy(authenticationFacade.getCurrentUser());
+        pin.setId(null);
         Travel travel = travelService.getTravelById(createPinDto.getTravelId());
         PlanningEvent planningEvent = new PlanningEvent();
         planningEvent.setPin(pin);
