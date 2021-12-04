@@ -29,7 +29,7 @@ public class PlanningEvent extends BaseEntity {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pin")
     private Pin pin;
 

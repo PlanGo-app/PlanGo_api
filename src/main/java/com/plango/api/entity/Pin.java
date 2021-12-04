@@ -29,7 +29,7 @@ public class Pin extends BaseEntity {
     @JoinColumn(name = "travel")
     private Travel travel;
 
-    @OneToOne(mappedBy = "pin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "pin", cascade = CascadeType.ALL)
     @JoinColumn(name = "planning_event")
     private PlanningEvent planningEvent;
 
