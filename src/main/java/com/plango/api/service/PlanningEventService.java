@@ -86,7 +86,7 @@ public class PlanningEventService {
         List<PlanningEvent> planningEventList = planningEventRepository.findAllByTravel(travel);
         return planningEventList
                 .stream()
-                .map(planningEvent -> mapper.map(planningEvent, GetPlanningEventDto.class))
+                .map(planningEvent -> custMapper.planningEventToGetPlanningEventDto(planningEvent))
                 .collect(Collectors.toList());
     }
 
