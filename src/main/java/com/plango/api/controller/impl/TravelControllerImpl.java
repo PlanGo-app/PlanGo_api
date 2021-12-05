@@ -53,6 +53,18 @@ public class TravelControllerImpl implements TravelController {
     }
 
     @Override
+    public ResponseEntity<String> deleteTravelById(Long id) {
+        try {
+            travelService.deleteTravelById(id);
+            return ResponseEntity.ok("Travel removed");
+        } catch (TravelNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @Override
     public ResponseEntity<String> addMemberToTravel(Long travelId, Long userId, String role) {
         try {
             Travel travel = travelService.getTravelById(travelId);
@@ -107,6 +119,18 @@ public class TravelControllerImpl implements TravelController {
         }
         catch(CurrentUserAuthorizationException e){
             return new ResponseEntity<>("Current user not authorized to delete a member for current travel.", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deleteCurrentUserOfTravel(Long travelId) {
+        try {
+            travelService.deleteCurrentMemberOfTravel(travelId);
+            return ResponseEntity.ok("Current user removed from the travel");
+        } catch (TravelNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (CurrentUserAuthorizationException | UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 

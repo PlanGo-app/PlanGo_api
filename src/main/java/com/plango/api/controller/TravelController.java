@@ -20,7 +20,7 @@ public interface TravelController {
      * Créer un voyage avec l'utilisateur courant comme Admin (ADMIN)
      *
      * @param newTravel : le voyage à créer
-     * @return ResponseEntity<GetTravelDto> Confirmation de la création du voyage
+     * @return ResponseEntity<GetTravelDto> Le voyage créé
      */
     @ApiOperation(value = "Créer un voyage avec l'utilisateur courant comme Admin")
     @ApiResponses(value = {
@@ -32,6 +32,21 @@ public interface TravelController {
             consumes= MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<GetTravelDto> createTravel(@RequestBody CreateTravelDto newTravel);
+
+    /***
+     * Supprime un voyage à partir de son Id
+     *
+     * @param id : l'id du voyage à supprimer
+     * @return ResponseEntity<String> Confirmation de la suppression du voyage
+     */
+    @ApiOperation(value = "Supprime un voyage")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, response = GetTravelDto.class, message = "Le voyage a bien été créé"),
+            @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
+            @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas les droits pour supprimer ce voyage'"),
+            @ApiResponse(code = 404, message = "Le voyage à supprimer n'a pas pu être trouvé")})
+    @DeleteMapping(path = "/{id}")
+    ResponseEntity<String> deleteTravelById(@PathVariable Long id);
 
     /***
      * Ajoute un utilisateur (membre) à un voyage avec un status donné
@@ -84,6 +99,20 @@ public interface TravelController {
             @ApiResponse(code = 404, message = "L'utilisateur membre à supprimer ou le voyage n'ont pas été trouvé")})
     @DeleteMapping("/{travelId}/member/{userId}")
     ResponseEntity<String> deleteMemberOfTravel(@PathVariable Long travelId, @PathVariable Long userId);
+
+    /***
+     * Supprime l'utilisateur courant (membre) d'un voyage
+     *
+     * @param travelId : l'id du voyage où se trouve le membre
+     * @return String Confirmation de la suppression de l'utilisateur courant du voyage
+     */
+    @ApiOperation(value = "Supprime l'utilisateur courant (membre) d'un voyage")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "L'utilisateur courant a bien été supprimé de ce voyage"),
+            @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
+            @ApiResponse(code = 404, message = "Le voyage n'a pas été trouvé")})
+    @DeleteMapping("/{travelId}/me")
+    ResponseEntity<String> deleteCurrentUserOfTravel(@PathVariable Long travelId);
 
     /***
      * Renvoi la liste des membres d'un voyage

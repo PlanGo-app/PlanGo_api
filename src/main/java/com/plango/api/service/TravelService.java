@@ -68,6 +68,14 @@ public class TravelService {
         return convertToGetDto(travel);
     }
 
+    public void deleteTravelById(Long id) throws TravelNotFoundException, CurrentUserAuthorizationException {
+        getTravelById(id);
+        if(!userRight.currentUserCanDeleteTravel(id)) {
+            throw new CurrentUserAuthorizationException(ExceptionMessage.CURRENT_USER_NOT_ALLOWED_TO_DELETE_TRAVEL);
+        }
+        travelRepository.deleteById(id);
+    }
+
     public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException {
         if(authenticationFacade.getCurrentUser() != user){
             this.checkOrganizerRoleCurrentUser(travel);
@@ -89,6 +97,25 @@ public class TravelService {
             this.checkAdminRoleCurrentUser(travel);
         }
         memberService.deleteMember(memberService.getMemberByTravel(travel, user));
+    }
+
+    public void deleteCurrentMemberOfTravel(Long travelId) throws UserNotFoundException, TravelNotFoundException, CurrentUserAuthorizationException {
+        Travel travel = getTravelById(travelId);
+        User currentUser = authenticationFacade.getCurrentUser();
+        Member member = memberService.getMemberByTravel(travel, currentUser);
+        memberService.deleteMember(member);
+        List<Member> listParticipants = memberService.getAllMembersByTravel(travel);
+        if(listParticipants.isEmpty()) { // If there are no membre left in this travel, remove it
+            travelRepository.deleteById(travelId);
+        } else if(member.getRole().equals(Role.ADMIN)) { // If current user was admin, delegate this role to an organizer
+            boolean adminAsNotBeenDelegated = true;
+            for(Member memberOfTravel:listParticipants) {
+                if(adminAsNotBeenDelegated && memberOfTravel.getRole().equals(Role.ORGANIZER)) {
+                    memberService.putMember(member, Role.ADMIN);
+                    adminAsNotBeenDelegated = false;
+                }
+            }
+        }
     }
 
     public TravelMembersDto getMembers(Long id) throws TravelNotFoundException {

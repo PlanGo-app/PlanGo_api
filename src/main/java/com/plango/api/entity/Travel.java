@@ -34,7 +34,13 @@ public class Travel extends BaseEntity {
     @Column(name = "invitation_code")
     private String invitationCode;
 
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    private List<Pin> pins;
+
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    private List<PlanningEvent> planningEvents;
+
     @NotNull
-    @OneToMany(mappedBy = "travel")
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
     private List<Member> members;
 }

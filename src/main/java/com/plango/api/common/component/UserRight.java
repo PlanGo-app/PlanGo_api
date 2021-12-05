@@ -53,4 +53,15 @@ public class UserRight {
             throw new CurrentUserAuthorizationException(e.getMessage());
         }
     }
+
+    public boolean currentUserCanDeleteTravel(Long travelId) throws CurrentUserAuthorizationException {
+        try {
+            Travel travel = travelService.getTravelById(travelId);
+            User user = authenticationFacade.getCurrentUser();
+            Role currentUserRole = memberService.getMemberByTravel(travel, user).getRole();
+            return currentUserRole.equals(Role.ADMIN);
+        } catch (UserNotFoundException | TravelNotFoundException e) {
+            throw new CurrentUserAuthorizationException(e.getMessage());
+        }
+    }
 }
