@@ -3,7 +3,7 @@ package com.plango.api.service;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.dto.member.MemberDto;
-import com.plango.api.dto.user.UserDto;
+import com.plango.api.dto.user.GetUserDto;
 import com.plango.api.entity.Member;
 import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
@@ -55,8 +55,8 @@ public class MemberService {
 
     public MemberDto convertToDto(Member member) {
         MemberDto memberDto = new MemberDto();
-        UserDto userDto = modelMapper.map(member.getUserMember(), UserDto.class);
-        memberDto.setUser(userDto);
+        GetUserDto getUserDto = modelMapper.map(member.getUserMember(), GetUserDto.class);
+        memberDto.setUser(getUserDto);
         memberDto.setRole(member.getRole());
         return memberDto;
     }

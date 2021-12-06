@@ -1,13 +1,13 @@
 package com.plango.api.dto.member;
 
 import com.plango.api.common.types.Role;
-import com.plango.api.dto.user.UserDto;
+import com.plango.api.dto.user.GetUserDto;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class MemberDto {
-    UserDto user;
+    GetUserDto user;
     Role role;
 }
