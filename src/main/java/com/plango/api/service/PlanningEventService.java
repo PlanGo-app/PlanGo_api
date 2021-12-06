@@ -61,7 +61,7 @@ public class PlanningEventService {
     }
 
     public void updatePlanningEvent(UpdatePlanningEventDto updatePlanningEventDto) throws PlanningEventNotFoundException, CurrentUserAuthorizationException, InvalidRequestDataException {
-        if(endDateIsBeforeStartDate(updatePlanningEventDto)) {
+        if(startDateAndEndDateAreSet(updatePlanningEventDto) && endDateIsBeforeStartDate(updatePlanningEventDto)) {
             throw new InvalidRequestDataException(ExceptionMessage.DATE_START_SHOULD_BE_BEFORE_DATE_END);
         }
         PlanningEvent planningEventOnUpdate = findPlanningEventById(updatePlanningEventDto.getId());
