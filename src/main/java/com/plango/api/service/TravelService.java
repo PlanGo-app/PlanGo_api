@@ -6,6 +6,7 @@ import com.plango.api.common.component.UserRight;
 import com.plango.api.common.constant.ExceptionMessage;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
+import com.plango.api.common.exception.UserIsAlreadyMemberException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.dto.member.MemberDto;
@@ -21,6 +22,7 @@ import com.plango.api.entity.Travel;
 import com.plango.api.entity.User;
 import com.plango.api.repository.TravelRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class TravelService {
 
@@ -64,7 +67,11 @@ public class TravelService {
         newTravel.setCreatedBy(currentUser);
         newTravel.setInvitationCode(this.generateUniqueInvitationCode());
         Travel travel = travelRepository.save(newTravel);
-        this.addMember(travel, currentUser, Role.ADMIN);
+        try {
+            this.addMember(travel, currentUser, Role.ADMIN);
+        } catch (UserIsAlreadyMemberException e) {
+            log.error("Error creating the travel, current user is already member.", e);
+        }
         return convertToGetDto(travel);
     }
 
@@ -76,7 +83,10 @@ public class TravelService {
         travelRepository.deleteById(id);
     }
 
-    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException {
+    public void addMember(Travel travel, User user, Role userRole) throws CurrentUserAuthorizationException, UserIsAlreadyMemberException {
+        if(memberService.isMember(user, travel)) {
+            throw new UserIsAlreadyMemberException(ExceptionMessage.USER_IS_ALREADY_MEMBER_OF_THE_TRAVEL);
+        }
         if(authenticationFacade.getCurrentUser() != user){
             this.checkOrganizerRoleCurrentUser(travel);
         }

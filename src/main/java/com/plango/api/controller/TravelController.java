@@ -62,7 +62,8 @@ public interface TravelController {
             @ApiResponse(code = 400, message = "Les informations données ne permettent pas d'ajouter un utilisateur au voyage"),
             @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
             @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas les droits pour ajouter un utilisateur à ce voyage'"),
-            @ApiResponse(code = 404, message = "L'utilisateur à ajouter ou le voyage n'ont pas été trouvé")})
+            @ApiResponse(code = 404, message = "L'utilisateur à ajouter ou le voyage n'ont pas été trouvé"),
+            @ApiResponse(code = 409, message = "L'utilisateur est déjà membre du voyage")})
     @PostMapping(path = "/{travelId}/member/{userId}")
     ResponseEntity<String> addMemberToTravel(@PathVariable Long travelId, @PathVariable Long userId, @RequestParam String role);
 
@@ -142,7 +143,8 @@ public interface TravelController {
                     message = "L'utilisateur a bien rejoint le vayage"),
             @ApiResponse(code = 401, message = "Pas de token d'identification valide fourni"),
             @ApiResponse(code = 403, message = "L'utilisateur courant n'a pas pu être identifié"),
-            @ApiResponse(code = 404, message = "Le voyage n'a pas été trouvé")})
+            @ApiResponse(code = 404, message = "Le voyage n'a pas été trouvé"),
+            @ApiResponse(code = 409, message = "L'utilisateur est déjà membre du voyage")})
     @PostMapping(path = "/invitation", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<GetTravelDto> addMemberToTravelWithInvitation(@RequestParam String code);
 

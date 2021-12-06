@@ -33,11 +33,11 @@ public class MemberService {
     }
 
     public Member getMemberByTravel(Travel travel, User user) throws UserNotFoundException {
-        Member member = memberRepository.findByTravelAndUserMember(travel, user).orElse(null);
-        if(member == null){
+        List<Member> member = memberRepository.findByTravelAndUserMember(travel, user);
+        if(member.isEmpty()){
             throw new UserNotFoundException("User not found for current travel.");
         }
-        return member;
+        return member.get(0);
     }
 
     public void createMember(Member newMember){
@@ -62,7 +62,7 @@ public class MemberService {
     }
 
     public boolean isMember(User user, Travel travel) {
-        return memberRepository.findByTravelAndUserMember(travel, user).orElse(null) != null;
+        return !memberRepository.findByTravelAndUserMember(travel, user).isEmpty();
     }
 
     public Member convertToEntity(MemberDto memberDto) {

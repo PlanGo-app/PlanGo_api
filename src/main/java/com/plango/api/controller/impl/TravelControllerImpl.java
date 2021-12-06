@@ -3,6 +3,7 @@ package com.plango.api.controller.impl;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import com.plango.api.common.exception.CurrentUserAuthorizationException;
 import com.plango.api.common.exception.TravelNotFoundException;
+import com.plango.api.common.exception.UserIsAlreadyMemberException;
 import com.plango.api.common.exception.UserNotFoundException;
 import com.plango.api.common.types.Role;
 import com.plango.api.controller.TravelController;
@@ -76,12 +77,12 @@ public class TravelControllerImpl implements TravelController {
             else {
                 return new ResponseEntity<>(String.format("Couldn't grant role %s which doesn't exist.", role), HttpStatus.BAD_REQUEST);
             }
-        }
-        catch (TravelNotFoundException | UserNotFoundException e) {
+        } catch (TravelNotFoundException | UserNotFoundException e) {
             return new ResponseEntity<>("Couldn't add user to travel because travel or user were not found.", HttpStatus.NOT_FOUND);
-        }
-        catch(CurrentUserAuthorizationException e){
+        } catch(CurrentUserAuthorizationException e){
             return new ResponseEntity<>("Current user not authorized to add a member to current travel.", HttpStatus.FORBIDDEN);
+        } catch (UserIsAlreadyMemberException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
@@ -157,6 +158,9 @@ public class TravelControllerImpl implements TravelController {
         } catch(CurrentUserAuthorizationException e){
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (UserIsAlreadyMemberException e) {
+            log.error(e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 
