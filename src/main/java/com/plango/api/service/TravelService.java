@@ -113,17 +113,24 @@ public class TravelService {
         Travel travel = getTravelById(travelId);
         User currentUser = authenticationFacade.getCurrentUser();
         Member member = memberService.getMemberByTravel(travel, currentUser);
-        memberService.deleteMember(member);
         List<Member> listParticipants = memberService.getAllMembersByTravel(travel);
-        if(listParticipants.isEmpty()) { // If there are no membre left in this travel, remove it
+        if(listParticipants.size() <= 1) { // If there are no membre left in this travel, remove it
             travelRepository.deleteById(travelId);
         } else if(member.getRole().equals(Role.ADMIN)) { // If current user was admin, delegate this role to an organizer
             boolean adminAsNotBeenDelegated = true;
+            User newAdmin = member.getUserMember();
             for(Member memberOfTravel:listParticipants) {
                 if(adminAsNotBeenDelegated && memberOfTravel.getRole().equals(Role.ORGANIZER)) {
-                    memberService.putMember(member, Role.ADMIN);
+                    memberService.putMember(memberOfTravel, Role.ADMIN);
+                    newAdmin = memberOfTravel.getUserMember();
                     adminAsNotBeenDelegated = false;
                 }
+            }
+            if(adminAsNotBeenDelegated) {
+                travelRepository.deleteById(travelId);
+            } else {
+                travel.setCreatedBy(newAdmin);
+                memberService.deleteMember(member);
             }
         }
     }
