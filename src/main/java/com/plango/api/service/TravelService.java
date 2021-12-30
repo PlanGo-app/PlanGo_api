@@ -117,7 +117,7 @@ public class TravelService {
         if(listParticipants.size() <= 1) { // If there are no membre left in this travel, remove it
             travelRepository.deleteById(travelId);
         }
-        if(member.getRole().equals(Role.ADMIN)) { // If current user was admin, delegate this role to an organizer
+        else if(member.getRole().equals(Role.ADMIN)) { // If current user was admin, delegate this role to an organizer
             boolean adminAsNotBeenDelegated = true;
             User newAdmin = member.getUserMember();
             for(Member memberOfTravel:listParticipants) {
